@@ -1,19 +1,20 @@
 # JSAdmin
 
-JSAdmin is a mountable Rails engine that exposes Active Record models through
-a generic CRUD UI. It discovers models from the host Rails application and builds
+JSAdmin is a mountable Rails engine that exposes Active Record models through a
+generic CRUD UI. It discovers models from the host Rails application and builds
 forms from database column metadata.
 
-> 2026-07-12 기준 RubyGems API에서 `js_admin`은 등록되지 않은 이름으로 확인했습니다. 공개 배포 직전에는 다시 한 번 점유 여부를 확인하세요.
+It is built for Rails 8.1+, Tailwind CSS, Turbo, and Stimulus.
 
 ## Installation
+
 Add this line to your application's Gemfile:
 
 ```ruby
-gem "js_admin", path: "../js_admin"
+gem "js_admin"
 ```
 
-And then execute:
+Install and mount the engine:
 
 ```bash
 bundle install
@@ -21,12 +22,18 @@ bin/rails generate js_admin:install
 bin/rails tailwindcss:engines
 ```
 
-The install generator mounts the engine at `/js_admin` and imports the engine
-Tailwind entrypoint when `app/assets/tailwind/application.css` exists.
+The install generator mounts JSAdmin at `/js_admin` and imports the engine
+Tailwind entrypoint when `app/assets/tailwind/application.css` exists. You can
+choose another mount path:
+
+```bash
+bin/rails generate js_admin:install --path=/admin
+bin/rails tailwindcss:engines
+```
 
 ## Usage
 
-Open:
+Open the mounted path:
 
 ```text
 /js_admin
@@ -43,6 +50,20 @@ JSAdmin.configure do |config|
   config.include_models User, Post
   config.exclude_models AuditLog
   config.records_per_page = 50
+end
+```
+
+## Authentication
+
+JSAdmin does not provide authentication. In production, mount the engine inside
+your application's admin authentication constraint.
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  authenticate :user, ->(user) { user.admin? } do
+    mount JSAdmin::Engine => "/admin"
+  end
 end
 ```
 
@@ -63,14 +84,32 @@ JSAdmin maps database columns to inputs automatically:
 Primary keys, timestamps, STI inheritance columns, readonly attributes, and
 generated columns are not editable.
 
-## Security
+## Development
 
-Zero model configuration is convenient, but it is dangerous to expose without
-authentication. In production, mount the engine inside your app's admin
-authentication constraint.
+Run the test suite:
 
-## Contributing
-Contribution directions go here.
+```bash
+bundle install
+bundle exec rails test
+```
+
+Build the gem locally:
+
+```bash
+gem build js_admin.gemspec
+```
+
+## Release
+
+Releases are published to RubyGems through GitHub Actions and RubyGems Trusted
+Publishing. To release a new version, update `lib/js_admin/version.rb`, update
+`CHANGELOG.md`, and push a matching tag:
+
+```bash
+git tag v0.0.2
+git push origin v0.0.2
+```
 
 ## License
+
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
