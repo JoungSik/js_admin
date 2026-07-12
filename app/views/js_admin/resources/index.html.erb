@@ -1,0 +1,54 @@
+<% content_for :title, @resource.label %>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <div class="mb-2 text-sm text-slate-500"><%= link_to "Models", root_path, class: "hover:text-slate-950" %> / <%= @resource.label %></div>
+    <h1 class="text-2xl font-semibold text-slate-950"><%= @resource.label %></h1>
+    <p class="mt-1 text-sm text-slate-600"><%= number_with_delimiter(@total_count) %> records</p>
+  </div>
+
+  <%= link_to "New #{@resource.singular_label}", new_resource_path(@resource.model_id), class: "inline-flex items-center justify-center rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-700" %>
+</div>
+
+<div class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+  <table class="min-w-full divide-y divide-slate-200">
+    <thead class="bg-slate-50">
+      <tr>
+        <% @resource.list_fields.each do |field| %>
+          <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"><%= field.human_name %></th>
+        <% end %>
+        <th scope="col" class="w-24 px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-200 bg-white">
+      <% @records.each do |record| %>
+        <tr class="hover:bg-slate-50">
+          <% @resource.list_fields.each do |field| %>
+            <td class="whitespace-nowrap px-4 py-3 text-sm"><%= js_admin_table_value(field, record) %></td>
+          <% end %>
+          <td class="whitespace-nowrap px-4 py-3 text-right text-sm">
+            <%= link_to "Open", resource_path(@resource.model_id, record), class: "font-medium text-sky-700 hover:text-sky-900" %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if @records.empty? %>
+        <tr>
+          <td colspan="<%= @resource.list_fields.size + 1 %>" class="px-4 py-10 text-center text-sm text-slate-500">No records</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4 flex items-center justify-between">
+  <div class="text-sm text-slate-500">Page <%= @page %></div>
+  <div class="flex gap-2">
+    <% if @resource.previous_page?(@page) %>
+      <%= link_to "Previous", resources_path(@resource.model_id, page: @page - 1), class: "rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50" %>
+    <% end %>
+    <% if @resource.next_page?(@page) %>
+      <%= link_to "Next", resources_path(@resource.model_id, page: @page + 1), class: "rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50" %>
+    <% end %>
+  </div>
+</div>

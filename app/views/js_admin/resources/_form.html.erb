@@ -1,0 +1,30 @@
+<%= form_with model: record, url: url, class: "space-y-6" do |form| %>
+  <% if record.errors.any? %>
+    <div class="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+      <p class="font-medium"><%= pluralize(record.errors.count, "error") %> prevented this record from being saved.</p>
+      <ul class="mt-2 list-disc space-y-1 pl-5">
+        <% record.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div class="divide-y divide-slate-200">
+      <% resource.editable_fields.each do |field| %>
+        <div class="grid gap-2 px-4 py-4 sm:grid-cols-3">
+          <%= form.label field.name, field.human_name, class: "text-sm font-medium text-slate-700" %>
+          <div class="sm:col-span-2">
+            <%= js_admin_field_input(form, field) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <%= form.submit class: "inline-flex items-center justify-center rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-700" %>
+    <%= link_to "Cancel", record.persisted? ? resource_path(resource.model_id, record) : resources_path(resource.model_id), class: "inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50" %>
+  </div>
+<% end %>
