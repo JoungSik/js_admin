@@ -62,6 +62,8 @@ bin/setup_sandbox
 gem "js_admin", path: ".."
 ```
 
+Engine의 view, helper, asset 파일은 `sandbox/app/...`로 복사되지 않습니다. Rails가 위 path gem 설정과 importmap pin을 통해 부모 checkout의 파일을 직접 로딩합니다.
+
 실행:
 
 ```bash
