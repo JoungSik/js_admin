@@ -4,7 +4,7 @@ JSAdmin is a mountable Rails engine that exposes Active Record models through a
 generic CRUD UI. It discovers models from the host Rails application and builds
 forms from database column metadata.
 
-It is built for Rails 8.1+, Tailwind CSS, Turbo, and Stimulus.
+It is built for Rails 8.1+, Tailwind CSS, and Hotwire-compatible Rails helpers.
 
 ## Installation
 
@@ -22,12 +22,12 @@ bin/rails generate js_admin:install
 bin/rails tailwindcss:engines
 ```
 
-The install generator mounts JSAdmin at `/js_admin` and imports the engine
+The install generator mounts JSAdmin at `/admin` and imports the engine
 Tailwind entrypoint when `app/assets/tailwind/application.css` exists. You can
 choose another mount path:
 
 ```bash
-bin/rails generate js_admin:install --path=/admin
+bin/rails generate js_admin:install --path=/backoffice
 bin/rails tailwindcss:engines
 ```
 
@@ -36,11 +36,17 @@ bin/rails tailwindcss:engines
 Open the mounted path:
 
 ```text
-/js_admin
+/admin
 ```
 
-By default, JSAdmin lists every concrete Active Record model with an existing
-database table. No per-model field setup is required.
+The home page is intentionally empty. Model navigation lives in the sidebar.
+By default, JSAdmin exposes every concrete Active Record model with an existing
+database table. Namespaced models are grouped under namespace dropdowns. No
+per-model field setup is required.
+
+The UI includes a fixed header, fixed desktop sidebar, dark mode toggle, compact
+pagination controls, and inline form validation errors. The default page size is
+10 records.
 
 Optional model filtering:
 
@@ -49,23 +55,27 @@ Optional model filtering:
 JSAdmin.configure do |config|
   config.include_models User, Post
   config.exclude_models AuditLog
-  config.records_per_page = 50
+  config.records_per_page = 10
 end
 ```
 
 ## Authentication
 
-JSAdmin does not provide authentication. In production, mount the engine inside
-your application's admin authentication constraint.
+JSAdmin works without authentication unless Basic Auth credentials are
+configured. When both username and password are set, every JSAdmin request
+requires HTTP Basic Auth.
 
 ```ruby
-# config/routes.rb
-Rails.application.routes.draw do
-  authenticate :user, ->(user) { user.admin? } do
-    mount JSAdmin::Engine => "/admin"
-  end
+# config/initializers/js_admin.rb
+JSAdmin.configure do |config|
+  config.basic_auth_username = ENV["JS_ADMIN_BASIC_AUTH_USERNAME"]
+  config.basic_auth_password = ENV["JS_ADMIN_BASIC_AUTH_PASSWORD"]
+  config.basic_auth_realm = "JSAdmin"
 end
 ```
+
+For production apps, you can also mount JSAdmin inside the host application's
+admin authentication constraint when you need app-level authorization.
 
 ## Field Mapping
 
@@ -84,6 +94,23 @@ JSAdmin maps database columns to inputs automatically:
 Primary keys, timestamps, STI inheritance columns, readonly attributes, and
 generated columns are not editable.
 
+## Hotwire Scope
+
+JSAdmin depends on `turbo-rails` and `stimulus-rails` so it works naturally in
+modern Rails apps. Current UI behavior is Turbo Drive compatible through Rails
+links and forms, and destructive actions use `data-turbo-confirm`.
+
+JSAdmin does not yet use Turbo Frames, Turbo Streams, or Stimulus controllers for
+table/form partial updates. Those are the expected next step when the UI moves
+from page-level CRUD navigation to frame-level interactions.
+
+## Validation Errors
+
+Form validation errors are rendered inside the form next to the matching field.
+JSAdmin renders form controls directly so Rails' default `field_with_errors`
+wrapper does not break the Tailwind grid layout. Errors that do not belong to an
+editable field are shown at the top of the form.
+
 ## Development
 
 Run the test suite:
@@ -97,6 +124,66 @@ Build the gem locally:
 
 ```bash
 gem build js_admin.gemspec
+```
+
+### Dummy App
+
+This repository includes `test/dummy` as the Rails engine test app. It is used by
+the test suite and should stay small.
+
+You can run it manually for functional checks:
+
+```bash
+bin/rails db:prepare
+bin/rails server
+```
+
+Open:
+
+```text
+http://localhost:3000/admin
+```
+
+### Sandbox App
+
+Use `sandbox/` when you want to verify the real installation flow in a fresh
+Rails app. The sandbox directory is ignored by Git.
+
+Create a sandbox app wired to this local checkout:
+
+```bash
+bin/setup_sandbox
+```
+
+The setup script creates several demo models, including a namespaced model, seeds
+sample records, and runs an initial Tailwind build.
+
+Run a one-off browser check:
+
+```bash
+cd sandbox
+bin/rails server
+```
+
+For iterative UI/CSS development, run the Rails server and Tailwind watcher
+together:
+
+```bash
+cd sandbox
+bin/dev
+```
+
+Open:
+
+```text
+http://localhost:3000/admin
+```
+
+Rebuild it from scratch:
+
+```bash
+rm -rf sandbox
+bin/setup_sandbox
 ```
 
 ## Release
