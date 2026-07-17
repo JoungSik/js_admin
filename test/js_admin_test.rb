@@ -23,19 +23,35 @@ class JSAdminTest < ActiveSupport::TestCase
       Rails.application.routes.draw do
       end
     RUBY
+    File.write(File.join(destination, "config/importmap.rb"), <<~RUBY)
+      pin "@hotwired/stimulus", to: "stimulus.min.js"
+    RUBY
 
     JSAdmin::Generators::InstallGenerator.start([], destination_root: destination)
     initializer = File.read(File.join(destination, "config/initializers/js_admin.rb"))
+    importmap = File.read(File.join(destination, "config/importmap.rb"))
 
     assert_includes initializer, "JSAdmin.configure do |config|"
     assert_includes initializer, "config.records_per_page = 10"
     assert_includes initializer, "config.basic_auth_username"
+    assert_includes importmap, 'pin "@hotwired/turbo-rails", to: "turbo.min.js"'
+    assert_equal 1, importmap.scan(/pin "@hotwired\/stimulus"/).size
+    assert_includes importmap, 'pin "js_admin", to: "js_admin/application.js", preload: true'
   ensure
     FileUtils.rm_rf(destination) if destination
   end
 
   test "configuration shows ten records per page by default" do
     assert_equal 10, JSAdmin::Configuration.new.records_per_page
+  end
+
+  test "javascript registers controllers with the host stimulus application when present" do
+    javascript = JSAdmin::Engine.root.join("app/assets/javascripts/js_admin/application.js").read
+
+    assert_includes javascript, 'import "@hotwired/turbo-rails"'
+    assert_includes javascript, "window.Stimulus || window.JSAdminStimulus || Application.start()"
+    assert_includes javascript, 'application.register("js-admin-theme", ThemeController)'
+    assert_includes javascript, 'application.register("js-admin-flash", FlashController)'
   end
 
   test "resource model id keeps namespace boundaries" do

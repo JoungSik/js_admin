@@ -50,6 +50,7 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     get "/admin/product/new"
 
     assert_response :success
+    assert_select "turbo-frame#js_admin_content"
     assert_select 'input[name="product[name]"]'
     assert_select 'textarea[name="product[description]"]'
     assert_select 'input[type="number"][name="product[price]"]'
@@ -95,7 +96,7 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select "[data-js-admin-flash]", 0
+    assert_select "[data-controller='js-admin-flash']", 0
     assert_select ".field_with_errors", 0
     assert_select "label[for='product_name']", text: "Name"
     assert_select "input[name='product[name]'][id='product_name'][aria-invalid='true'][aria-describedby='product_name_error']"
@@ -128,10 +129,25 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/admin/product"
   end
 
+  test "deletes a record through turbo stream updates" do
+    assert_difference "Product.count", -1 do
+      delete "/admin/product/#{@product.id}", headers: {
+        "Accept" => "text/vnd.turbo-stream.html"
+      }
+    end
+
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_includes response.body, 'target="js_admin_flash"'
+    assert_includes response.body, 'target="js_admin_content_body"'
+    assert_includes response.body, "Product was deleted."
+  end
+
   test "renders view edit and delete row actions" do
     get "/admin/product"
 
     assert_response :success
+    assert_select "turbo-frame#js_admin_content"
     assert_select "a", text: "View"
     assert_select "a", text: "Edit"
     assert_select "button", text: "Delete"

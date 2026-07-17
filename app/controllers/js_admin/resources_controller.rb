@@ -4,10 +4,7 @@ module JSAdmin
     before_action :set_record, only: %i[show edit update destroy]
 
     def index
-      @total_count = @resource.count
-      @total_pages = @resource.total_pages(total_count: @total_count)
-      @page = [ [ params.fetch(:page, 1).to_i, 1 ].max, @total_pages ].min
-      @records = @resource.records(page: @page)
+      load_records
     end
 
     def show
@@ -40,7 +37,15 @@ module JSAdmin
 
     def destroy
       @record.destroy
-      redirect_to resources_path(@resource.model_id), notice: "#{@resource.singular_label} was deleted."
+      message = "#{@resource.singular_label} was deleted."
+
+      respond_to do |format|
+        format.turbo_stream do
+          flash.now[:notice] = message
+          load_records
+        end
+        format.html { redirect_to resources_path(@resource.model_id), notice: message }
+      end
     end
 
     private
@@ -51,6 +56,13 @@ module JSAdmin
 
     def set_record
       @record = @resource.find(params[:id])
+    end
+
+    def load_records
+      @total_count = @resource.count
+      @total_pages = @resource.total_pages(total_count: @total_count)
+      @page = [ [ params.fetch(:page, 1).to_i, 1 ].max, @total_pages ].min
+      @records = @resource.records(page: @page)
     end
 
     def resource_params

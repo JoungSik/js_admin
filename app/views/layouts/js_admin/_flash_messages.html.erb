@@ -1,0 +1,9 @@
+<div class="w-full max-w-sm space-y-3">
+  <% if notice.present? %>
+    <div data-controller="js-admin-flash" data-js-admin-flash-timeout-value="4000" class="<%= js_admin_flash_classes(:notice) %>" role="status"><%= notice %></div>
+  <% end %>
+
+  <% if alert.present? %>
+    <div data-controller="js-admin-flash" data-js-admin-flash-timeout-value="4000" class="<%= js_admin_flash_classes(:alert) %>" role="alert"><%= alert %></div>
+  <% end %>
+</div>

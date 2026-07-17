@@ -22,58 +22,6 @@
       var darkEnabled = storedTheme === "dark" || (!storedTheme && prefersDark);
 
       document.documentElement.classList.toggle("dark", darkEnabled);
-
-      function bindThemeToggle() {
-        var toggle = document.querySelector("[data-js-admin-theme-toggle]");
-        if (!toggle || toggle.dataset.jsAdminThemeBound === "true") {
-          return;
-        }
-
-        toggle.dataset.jsAdminThemeBound = "true";
-        toggle.setAttribute("aria-pressed", document.documentElement.classList.contains("dark"));
-
-        toggle.addEventListener("click", function() {
-          var enabled = !document.documentElement.classList.contains("dark");
-
-          document.documentElement.classList.toggle("dark", enabled);
-          toggle.setAttribute("aria-pressed", enabled);
-
-          try {
-            localStorage.setItem(storageKey, enabled ? "dark" : "light");
-          } catch (error) {
-            return;
-          }
-        });
-      }
-
-      function dismissFlashMessage(message) {
-        message.classList.add("opacity-0", "translate-y-1");
-        window.setTimeout(function() {
-          message.remove();
-        }, 300);
-      }
-
-      function bindFlashMessages() {
-        document.querySelectorAll("[data-js-admin-flash]").forEach(function(message) {
-          if (message.dataset.jsAdminFlashBound === "true") {
-            return;
-          }
-
-          message.dataset.jsAdminFlashBound = "true";
-
-          window.setTimeout(function() {
-            dismissFlashMessage(message);
-          }, parseInt(message.dataset.jsAdminFlashTimeout || "4000", 10));
-        });
-      }
-
-      function bindPageBehavior() {
-        bindThemeToggle();
-        bindFlashMessages();
-      }
-
-      document.addEventListener("DOMContentLoaded", bindPageBehavior);
-      document.addEventListener("turbo:load", bindPageBehavior);
     })();
   <% end %>
 
@@ -81,33 +29,19 @@
 
   <%= js_admin_stylesheet_link_tag "tailwind" %>
   <%= stylesheet_link_tag "js_admin/application", media: "all", "data-turbo-track": "reload" %>
-  <%= js_admin_hotwire_javascript_tags %>
+  <%= js_admin_javascript_tags %>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-950 antialiased dark:bg-slate-950 dark:text-slate-100">
+<body class="min-h-screen bg-slate-50 text-slate-950 antialiased dark:bg-slate-950 dark:text-slate-100" data-controller="js-admin-theme">
   <div class="min-h-screen">
     <header class="fixed inset-x-0 top-0 z-40 border-b border-slate-200 bg-white/95 dark:border-slate-800 dark:bg-slate-900/95">
       <div class="flex min-h-16 w-full items-center">
         <div class="flex min-h-16 shrink-0 items-center px-5 sm:px-8 lg:w-64 lg:border-r lg:border-slate-200 lg:px-5 lg:dark:border-slate-800">
-          <%= link_to "JSAdmin", root_path, class: "text-base font-semibold text-slate-950 dark:text-slate-100" %>
+          <%= link_to "JSAdmin", root_path, class: "text-base font-semibold text-slate-950 dark:text-slate-100", data: js_admin_content_link_data %>
         </div>
 
         <div class="min-h-16 min-w-0 flex-1"></div>
       </div>
     </header>
-
-    <% if notice.present? || alert.present? %>
-      <div class="pointer-events-none fixed right-0 top-4 z-50 flex w-full justify-end px-4 sm:right-4 sm:w-auto sm:px-0">
-        <div class="w-full max-w-sm space-y-3">
-          <% if notice.present? %>
-            <div data-js-admin-flash data-js-admin-flash-timeout="4000" class="<%= js_admin_flash_classes(:notice) %>" role="status"><%= notice %></div>
-          <% end %>
-
-          <% if alert.present? %>
-            <div data-js-admin-flash data-js-admin-flash-timeout="4000" class="<%= js_admin_flash_classes(:alert) %>" role="alert"><%= alert %></div>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
 
     <div class="flex w-full flex-col pt-16 lg:flex-row">
       <%= render "layouts/js_admin/sidebar" %>

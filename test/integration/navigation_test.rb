@@ -28,12 +28,16 @@ class NavigationTest < ActionDispatch::IntegrationTest
     get "/admin"
 
     assert_response :success
+    assert_select "body[data-controller='js-admin-theme']"
+    assert_select "script[type='importmap']", text: /"js_admin"/
+    assert_select "script[type='module']", text: /import "js_admin"/
+    assert_select "turbo-frame#js_admin_content[data-turbo-action='advance']"
     assert_select "main [data-js-admin-home]", 1
     assert_select "main a", 0
-    assert_select "aside [data-js-admin-sidebar-link='category']", text: "Category"
-    assert_select "aside [data-js-admin-sidebar-link='product']", text: "Product"
-    assert_select "aside [data-js-admin-theme-toggle]", text: /Theme/
-    assert_select "header [data-js-admin-theme-toggle]", 0
+    assert_select "aside [data-js-admin-sidebar-link='category'][data-turbo-frame='js_admin_content'][data-turbo-action='advance']", text: "Category"
+    assert_select "aside [data-js-admin-sidebar-link='product'][data-turbo-frame='js_admin_content'][data-turbo-action='advance']", text: "Product"
+    assert_select "aside [data-js-admin-theme-target='toggle'][data-action='js-admin-theme#toggle']", text: /Theme/
+    assert_select "header [data-js-admin-theme-target='toggle']", 0
     assert_select "header.fixed.top-0"
     assert_select "div.pt-16"
     assert_select "aside.lg\\:top-16"
@@ -48,9 +52,20 @@ class NavigationTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_select "aside [data-js-admin-sidebar-link='place']", text: "Place"
+    assert_select "aside [data-js-admin-sidebar-link='place'][data-turbo-frame='js_admin_content']", text: "Place"
     assert_select "aside details summary", text: /Ad/
-    assert_select "aside details [data-js-admin-sidebar-link='ad--place']", text: "Place"
+    assert_select "aside details [data-js-admin-sidebar-link='ad--place'][data-turbo-frame='js_admin_content']", text: "Place"
+  end
+
+  test "renders frame content for turbo frame requests" do
+    get "/admin/product", headers: {
+      "Turbo-Frame" => "js_admin_content"
+    }
+
+    assert_response :success
+    assert_select "turbo-frame#js_admin_content"
+    assert_select "#js_admin_content_body"
+    assert_select "h1", text: "Product"
   end
 
   private

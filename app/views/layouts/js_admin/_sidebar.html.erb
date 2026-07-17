@@ -3,7 +3,7 @@
     <section>
       <div class="space-y-1">
         <% js_admin_sidebar_top_level_resources.each do |resource| %>
-          <%= link_to js_admin_sidebar_resource_label(resource), resources_path(resource.model_id), class: js_admin_sidebar_link_classes(resource), data: { js_admin_sidebar_link: resource.model_id } %>
+          <%= link_to js_admin_sidebar_resource_label(resource), resources_path(resource.model_id), class: js_admin_sidebar_link_classes(resource), data: js_admin_content_link_data.merge(js_admin_sidebar_link: resource.model_id) %>
         <% end %>
 
         <% js_admin_sidebar_namespace_groups.each do |namespace, resources| %>
@@ -15,7 +15,7 @@
 
             <div class="mt-1 space-y-1 pl-3">
               <% resources.each do |resource| %>
-                <%= link_to js_admin_sidebar_resource_label(resource), resources_path(resource.model_id), class: js_admin_sidebar_link_classes(resource), data: { js_admin_sidebar_link: resource.model_id } %>
+                <%= link_to js_admin_sidebar_resource_label(resource), resources_path(resource.model_id), class: js_admin_sidebar_link_classes(resource), data: js_admin_content_link_data.merge(js_admin_sidebar_link: resource.model_id) %>
               <% end %>
             </div>
           </details>
@@ -25,7 +25,7 @@
   </nav>
 
   <div class="shrink-0 border-t border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-8 lg:px-5">
-    <button type="button" data-js-admin-theme-toggle class="inline-flex h-9 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" aria-label="Toggle dark mode" aria-pressed="false">
+    <button type="button" data-js-admin-theme-target="toggle" data-action="js-admin-theme#toggle" class="inline-flex h-9 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" aria-label="Toggle dark mode" aria-pressed="false">
       <span class="flex items-center gap-2">
         <span class="h-2.5 w-2.5 rounded-full bg-slate-500 dark:bg-amber-300"></span>
         <span>Theme</span>

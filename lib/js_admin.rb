@@ -1,5 +1,6 @@
 require "js_admin/version"
 
+require "importmap-rails"
 require "stimulus-rails"
 require "tailwindcss-rails"
 require "turbo-rails"

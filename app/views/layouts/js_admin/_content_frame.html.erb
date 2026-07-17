@@ -1,0 +1,7 @@
+<%= turbo_frame_tag js_admin_content_frame_id, data: js_admin_content_frame_data do %>
+  <%= render "layouts/js_admin/flash", notice: notice, alert: alert %>
+
+  <div id="<%= js_admin_content_body_id %>">
+    <%= yield %>
+  </div>
+<% end %>

@@ -1,3 +1,5 @@
 <% content_for :title, "JSAdmin" %>
 
-<div data-js-admin-home></div>
+<%= render layout: "layouts/js_admin/content_frame" do %>
+  <div data-js-admin-home></div>
+<% end %>
