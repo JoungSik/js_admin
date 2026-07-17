@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 - 2026-07-18
+
 - Change the default mount path to `/admin`.
 - Add optional HTTP Basic Auth configuration.
 - Generate a commented `config/initializers/js_admin.rb` during installation.
