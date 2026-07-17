@@ -4,6 +4,7 @@
 /.yardoc/
 /coverage/
 /pkg/
+/sandbox/
 /tmp/
 *.gem
 *.log

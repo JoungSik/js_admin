@@ -1,0 +1,230 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+
+ROOT = File.expand_path("..", __dir__)
+SANDBOX_PATH = File.join(ROOT, "sandbox")
+PARENT_PATH = File.dirname(ROOT)
+SANDBOX_APP_PATH = File.join(File.basename(ROOT), "sandbox")
+
+def run!(*command, chdir: ROOT)
+  puts "$ #{command.join(" ")}"
+  success = system(*command, chdir: chdir)
+  abort "Command failed: #{command.join(" ")}" unless success
+end
+
+def generate_model(*arguments)
+  run!("bin/rails", "generate", "model", *arguments, chdir: SANDBOX_PATH)
+end
+
+def write_sandbox_models
+  File.write(File.join(SANDBOX_PATH, "app/models/author.rb"), <<~'RUBY')
+    class Author < ApplicationRecord
+      has_many :articles, dependent: :nullify
+      has_many :comments, dependent: :nullify
+
+      validates :name, presence: true
+    end
+  RUBY
+
+  File.write(File.join(SANDBOX_PATH, "app/models/category.rb"), <<~'RUBY')
+    class Category < ApplicationRecord
+      has_many :articles, dependent: :nullify
+
+      validates :name, presence: true
+    end
+  RUBY
+
+  File.write(File.join(SANDBOX_PATH, "app/models/article.rb"), <<~'RUBY')
+    class Article < ApplicationRecord
+      belongs_to :author, optional: true
+      belongs_to :category, optional: true
+      has_many :comments, dependent: :destroy
+
+      enum :status, { draft: 0, review: 1, published: 2, archived: 3 }
+
+      validates :title, presence: true
+    end
+  RUBY
+
+  File.write(File.join(SANDBOX_PATH, "app/models/comment.rb"), <<~'RUBY')
+    class Comment < ApplicationRecord
+      belongs_to :article
+      belongs_to :author, optional: true
+
+      validates :body, presence: true
+    end
+  RUBY
+
+  File.write(File.join(SANDBOX_PATH, "app/models/place.rb"), <<~'RUBY')
+    class Place < ApplicationRecord
+      enum :kind, { retail: 0, office: 1, venue: 2 }
+
+      validates :name, presence: true
+    end
+  RUBY
+
+  FileUtils.mkdir_p(File.join(SANDBOX_PATH, "app/models/ad"))
+  File.write(File.join(SANDBOX_PATH, "app/models/ad/place.rb"), <<~'RUBY')
+    module Ad
+      class Place < ApplicationRecord
+        enum :status, { planned: 0, active: 1, paused: 2, ended: 3 }
+
+        validates :name, presence: true
+      end
+    end
+  RUBY
+end
+
+def write_sandbox_initializer
+  File.write(File.join(SANDBOX_PATH, "config/initializers/js_admin.rb"), <<~'RUBY')
+    JSAdmin.configure do |config|
+      config.records_per_page = 10
+    end
+  RUBY
+end
+
+def write_sandbox_seeds
+  File.write(File.join(SANDBOX_PATH, "db/seeds.rb"), <<~'RUBY')
+    Ad::Place.delete_all
+    Comment.delete_all
+    Article.delete_all
+    Place.delete_all
+    Category.delete_all
+    Author.delete_all
+
+    authors = [
+      Author.create!(name: "Mina Park", email: "mina@example.com", active: true, joined_on: 18.months.ago.to_date, bio: "Writes product and Rails notes."),
+      Author.create!(name: "Joon Lee", email: "joon@example.com", active: true, joined_on: 10.months.ago.to_date, bio: "Reviews operational workflows."),
+      Author.create!(name: "Sara Kim", email: "sara@example.com", active: false, joined_on: 2.years.ago.to_date, bio: "Maintains archived documentation.")
+    ]
+
+    categories = [
+      Category.create!(name: "Engineering", position: 1, visible: true),
+      Category.create!(name: "Operations", position: 2, visible: true),
+      Category.create!(name: "Announcements", position: 3, visible: false)
+    ]
+
+    articles = 80.times.map do |index|
+      Article.create!(
+        author: authors[index % authors.size],
+        category: categories[index % categories.size],
+        title: "Sandbox Article #{index + 1}",
+        summary: "Short summary for sandbox article #{index + 1}",
+        body: "This article exists to exercise generated text areas, select boxes, dates, booleans, and enum fields.",
+        status: Article.statuses.keys[index % Article.statuses.size],
+        featured: index.even?,
+        views_count: (index + 1) * 137,
+        published_at: index.days.ago,
+        published_on: index.days.ago.to_date
+      )
+    end
+
+    articles.each_with_index do |article, index|
+      3.times do |comment_index|
+        Comment.create!(
+          article: article,
+          author: authors[(index + comment_index) % authors.size],
+          body: "Comment #{comment_index + 1} for #{article.title}",
+          approved: comment_index.even?,
+          score: index + comment_index + 1,
+          posted_at: (index + comment_index).hours.ago
+        )
+      end
+    end
+
+    [
+      [ "Seoul Office", "12 Teheran-ro, Seoul", "office", 4.80, true ],
+      [ "Busan Store", "88 Marine City, Busan", "retail", 4.35, true ],
+      [ "Conference Hall", "22 Expo-ro, Daejeon", "venue", 4.65, false ],
+      [ "Pop-up Studio", "7 Yeonnam-ro, Seoul", "retail", 4.10, true ]
+    ].each_with_index do |(name, address, kind, rating, open), index|
+      Place.create!(
+        name: name,
+        address: address,
+        kind: kind,
+        rating: rating,
+        open: open,
+        opened_on: (index + 1).years.ago.to_date
+      )
+    end
+
+    [
+      [ "Homepage Hero", "hero", 1_500_000, "active", 1.day.ago, 20.days.from_now, 1 ],
+      [ "Sidebar Banner", "sidebar", 850_000, "planned", 3.days.from_now, 30.days.from_now, 2 ],
+      [ "Article Inline", "inline", 640_000, "paused", 10.days.ago, 10.days.from_now, 3 ]
+    ].each do |name, slot, budget, status, starts_at, ends_at, priority|
+      Ad::Place.create!(
+        name: name,
+        slot: slot,
+        budget: budget,
+        status: status,
+        active: status == "active",
+        starts_at: starts_at,
+        ends_at: ends_at,
+        priority: priority
+      )
+    end
+  RUBY
+end
+
+if Dir.exist?(SANDBOX_PATH)
+  abort "sandbox already exists. Remove it first if you want to rebuild: rm -rf sandbox"
+end
+
+run!(
+  "rails",
+  "new",
+  SANDBOX_APP_PATH,
+  "--css=tailwind",
+  "--skip-git",
+  "--skip-docker",
+  "--skip-ci",
+  "--skip-kamal",
+  "--skip-devcontainer",
+  chdir: PARENT_PATH
+)
+
+gemfile_path = File.join(SANDBOX_PATH, "Gemfile")
+File.open(gemfile_path, "a") do |gemfile|
+  gemfile.puts
+  gemfile.puts '# Local JSAdmin checkout for sandbox verification'
+  gemfile.puts 'gem "js_admin", path: ".."'
+end
+
+run!("bundle", "install", chdir: SANDBOX_PATH)
+run!("bin/rails", "generate", "js_admin:install", chdir: SANDBOX_PATH)
+write_sandbox_initializer
+generate_model("Author", "name:string", "email:string", "active:boolean", "joined_on:date", "bio:text")
+generate_model("Category", "name:string", "position:integer", "visible:boolean")
+generate_model(
+  "Article",
+  "author:references",
+  "category:references",
+  "title:string",
+  "summary:string",
+  "body:text",
+  "status:integer",
+  "featured:boolean",
+  "views_count:integer",
+  "published_at:datetime",
+  "published_on:date"
+)
+generate_model("Comment", "article:references", "author:references", "body:text", "approved:boolean", "score:integer", "posted_at:datetime")
+generate_model("Place", "name:string", "address:string", "kind:integer", "rating:decimal{5,2}", "open:boolean", "opened_on:date")
+generate_model("Ad::Place", "name:string", "slot:string", "budget:decimal{10,2}", "status:integer", "active:boolean", "starts_at:datetime", "ends_at:datetime", "priority:integer")
+write_sandbox_models
+write_sandbox_seeds
+run!("bin/rails", "db:migrate", chdir: SANDBOX_PATH)
+run!("bin/rails", "db:seed", chdir: SANDBOX_PATH)
+run!("bin/rails", "tailwindcss:build", chdir: SANDBOX_PATH)
+
+puts
+puts "Sandbox ready:"
+puts "  cd sandbox"
+puts "  # One-off check. CSS has already been built by setup_sandbox."
+puts "  bin/rails server"
+puts "  # Iterative UI/CSS development."
+puts "  bin/dev"
+puts "  http://localhost:3000/admin"
