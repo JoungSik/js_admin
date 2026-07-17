@@ -48,7 +48,23 @@ The UI includes a fixed header, fixed desktop sidebar, dark mode toggle, compact
 pagination controls, and inline form validation errors. The default page size is
 10 records.
 
-Optional model filtering:
+The install generator also creates `config/initializers/js_admin.rb` with
+commented configuration examples. JSAdmin works without changing that file.
+
+Available configuration options:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `included_models` | `[]` | Model names/classes to expose. Empty means every discovered concrete Active Record model. |
+| `excluded_models` | `[]` | Model names/classes to hide after discovery. |
+| `records_per_page` | `10` | Number of records shown per resource index page. |
+| `association_limit` | `100` | Maximum number of associated records loaded into a `belongs_to` select. |
+| `display_name_methods` | `%i[name title email username id]` | Methods tried in order when displaying records in tables and select labels. |
+| `basic_auth_username` | `nil` | HTTP Basic Auth username. Auth is disabled unless username and password are both present. |
+| `basic_auth_password` | `nil` | HTTP Basic Auth password. |
+| `basic_auth_realm` | `"JSAdmin"` | HTTP Basic Auth realm. |
+
+Example:
 
 ```ruby
 # config/initializers/js_admin.rb
