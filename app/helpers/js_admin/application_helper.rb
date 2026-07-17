@@ -3,6 +3,7 @@ module JSAdmin
     CONTENT_FRAME_ID = "js_admin_content"
     CONTENT_BODY_ID = "js_admin_content_body"
     FLASH_ID = "js_admin_flash"
+    THEME_COOKIE_NAME = "js_admin_theme"
 
     TEXT_INPUT_CLASSES = [
       "w-full rounded-md border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-950 shadow-sm",
@@ -235,6 +236,10 @@ module JSAdmin
       return unless respond_to?(:javascript_importmap_tags)
 
       javascript_importmap_tags "js_admin"
+    end
+
+    def js_admin_html_classes
+      "dark" if cookies[THEME_COOKIE_NAME] == "dark"
     end
 
     def js_admin_asset_exists?(logical_path)

@@ -6,7 +6,9 @@ module JSAdmin
       IMPORTMAP_PINS = {
         "@hotwired/turbo-rails" => 'pin "@hotwired/turbo-rails", to: "turbo.min.js"',
         "@hotwired/stimulus" => 'pin "@hotwired/stimulus", to: "stimulus.min.js"',
-        "js_admin" => 'pin "js_admin", to: "js_admin/application.js", preload: true'
+        "js_admin" => 'pin "js_admin", to: "js_admin/application.js", preload: true',
+        "js_admin/controllers/theme_controller" => 'pin "js_admin/controllers/theme_controller", to: "js_admin/controllers/theme_controller.js", preload: true',
+        "js_admin/controllers/flash_controller" => 'pin "js_admin/controllers/flash_controller", to: "js_admin/controllers/flash_controller.js", preload: true'
       }.freeze
 
       namespace "js_admin:install"
