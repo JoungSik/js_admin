@@ -22,13 +22,25 @@ bin/rails generate js_admin:install
 bin/rails tailwindcss:engines
 ```
 
-The install generator mounts JSAdmin at `/admin` and imports the engine
-Tailwind entrypoint when `app/assets/tailwind/application.css` exists. You can
-choose another mount path:
+The install generator mounts JSAdmin at `/admin`, pins JSAdmin's JavaScript in
+`config/importmap.rb`, and imports the engine Tailwind entrypoint when
+`app/assets/tailwind/application.css` exists. You can choose another mount path:
 
 ```bash
 bin/rails generate js_admin:install --path=/backoffice
 bin/rails tailwindcss:engines
+```
+
+JSAdmin uses `importmap-rails` for JavaScript loading. Rails 8 default apps
+already include `config/importmap.rb`; if it was removed, run
+`bin/rails importmap:install` before running `js_admin:install`.
+
+The generator adds these pins when they are missing:
+
+```ruby
+pin "@hotwired/turbo-rails", to: "turbo.min.js"
+pin "@hotwired/stimulus", to: "stimulus.min.js"
+pin "js_admin", to: "js_admin/application.js", preload: true
 ```
 
 ## Usage
@@ -112,13 +124,17 @@ generated columns are not editable.
 
 ## Hotwire Scope
 
-JSAdmin depends on `turbo-rails` and `stimulus-rails` so it works naturally in
-modern Rails apps. Current UI behavior is Turbo Drive compatible through Rails
-links and forms, and destructive actions use `data-turbo-confirm`.
+JSAdmin depends on `importmap-rails`, `turbo-rails`, and `stimulus-rails` so it
+works naturally in modern Rails apps using the Rails default Hotwire setup.
 
-JSAdmin does not yet use Turbo Frames, Turbo Streams, or Stimulus controllers for
-table/form partial updates. Those are the expected next step when the UI moves
-from page-level CRUD navigation to frame-level interactions.
+The admin shell keeps the header and sidebar stable while the main CRUD area is
+wrapped in a Turbo Frame. Sidebar navigation, resource links, forms, and
+pagination update that frame instead of replacing the whole page. Delete actions
+can respond with Turbo Streams to refresh the flash region and resource list.
+
+Stimulus controllers manage the dark mode toggle and auto-dismiss flash
+messages. The small inline theme bootstrap in the layout only applies the saved
+dark mode class before the page paints.
 
 ## Validation Errors
 
