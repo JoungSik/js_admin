@@ -44,8 +44,8 @@ Ruby 상수는 `JSAdmin`을 사용합니다. `lib/js_admin/engine.rb`의 inflect
 - main CRUD 영역은 `js_admin_content` Turbo Frame으로 감싸고, header/sidebar는 frame 밖에 고정합니다.
 - sidebar/header navigation은 `js_admin_content`를 target으로 지정해 shell 전체 교체를 피합니다.
 - Turbo Stream 응답은 flash region과 `js_admin_content_body`처럼 필요한 대상만 갱신합니다.
-- dark mode toggle과 flash auto-dismiss는 `js-admin-theme`, `js-admin-flash` Stimulus controller에서 관리합니다. 초기 dark class 적용을 위한 작은 inline script는 layout head에 유지합니다.
-- JSAdmin JavaScript는 `config/importmap.rb`의 `js_admin` pin을 통해 로딩합니다. engine layout에서는 `javascript_importmap_tags "js_admin"`를 사용합니다.
+- dark mode toggle과 flash auto-dismiss는 `js-admin-theme`, `js-admin-flash` Stimulus controller에서 관리합니다. 저장된 theme는 cookie로도 유지해 layout이 inline script 없이 초기 dark class를 렌더링합니다.
+- JSAdmin JavaScript는 `config/importmap.rb`의 `js_admin` entrypoint pin과 `js_admin/controllers/*` controller pin을 통해 로딩합니다. engine layout에서는 `javascript_importmap_tags "js_admin"`를 사용합니다.
 
 ## Field Mapping
 
