@@ -1,4 +1,9 @@
 require "js_admin/version"
+
+require "stimulus-rails"
+require "tailwindcss-rails"
+require "turbo-rails"
+
 require "js_admin/configuration"
 require "js_admin/field"
 require "js_admin/registry"

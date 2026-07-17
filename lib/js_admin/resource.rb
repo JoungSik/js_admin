@@ -7,7 +7,7 @@ module JSAdmin
     end
 
     def model_id
-      model_class.name.underscore.tr("/", "--")
+      model_class.name.underscore.gsub("/", "--")
     end
 
     def label
@@ -42,12 +42,16 @@ module JSAdmin
       page_number = [ page.to_i, 1 ].max
       model_class.all
         .then { |scope| ordered_scope(scope) }
-        .limit(JSAdmin.configuration.records_per_page)
-        .offset((page_number - 1) * JSAdmin.configuration.records_per_page)
+        .limit(records_per_page)
+        .offset((page_number - 1) * records_per_page)
     end
 
     def count
       model_class.count
+    end
+
+    def total_pages(total_count: count)
+      [ (total_count.to_f / records_per_page).ceil, 1 ].max
     end
 
     def find(record_id)
@@ -69,7 +73,7 @@ module JSAdmin
     end
 
     def next_page?(page)
-      count > page.to_i * JSAdmin.configuration.records_per_page
+      page.to_i < total_pages
     end
 
     def previous_page?(page)
@@ -83,6 +87,10 @@ module JSAdmin
       return scope unless primary_key && model_class.column_names.include?(primary_key)
 
       scope.order(primary_key => :desc)
+    end
+
+    def records_per_page
+      [ JSAdmin.configuration.records_per_page.to_i, 1 ].max
     end
   end
 end

@@ -1,7 +1,70 @@
 require "test_helper"
 
 class NavigationTest < ActionDispatch::IntegrationTest
-  # test "the truth" do
-  #   assert true
-  # end
+  SidebarModelClass = Struct.new(:name)
+  SidebarResource = Struct.new(:model_class, :model_id)
+
+  setup do
+    JSAdmin.configure do |config|
+      config.included_models = [ "Category", "Product" ]
+      config.excluded_models = []
+      config.basic_auth_username = nil
+      config.basic_auth_password = nil
+      config.basic_auth_realm = "JSAdmin"
+    end
+  end
+
+  teardown do
+    JSAdmin.configure do |config|
+      config.included_models = []
+      config.excluded_models = []
+      config.basic_auth_username = nil
+      config.basic_auth_password = nil
+      config.basic_auth_realm = "JSAdmin"
+    end
+  end
+
+  test "renders empty home content with sidebar model navigation" do
+    get "/admin"
+
+    assert_response :success
+    assert_select "main [data-js-admin-home]", 1
+    assert_select "main a", 0
+    assert_select "aside [data-js-admin-sidebar-link='category']", text: "Category"
+    assert_select "aside [data-js-admin-sidebar-link='product']", text: "Product"
+    assert_select "aside [data-js-admin-theme-toggle]", text: /Theme/
+    assert_select "header [data-js-admin-theme-toggle]", 0
+    assert_select "header.fixed.top-0"
+    assert_select "div.pt-16"
+    assert_select "aside.lg\\:top-16"
+  end
+
+  test "groups namespaced resources in sidebar dropdowns" do
+    with_sidebar_resources([
+      sidebar_resource("Place", "place"),
+      sidebar_resource("Ad::Place", "ad--place")
+    ]) do
+      get "/admin"
+    end
+
+    assert_response :success
+    assert_select "aside [data-js-admin-sidebar-link='place']", text: "Place"
+    assert_select "aside details summary", text: /Ad/
+    assert_select "aside details [data-js-admin-sidebar-link='ad--place']", text: "Place"
+  end
+
+  private
+
+  def sidebar_resource(class_name, model_id)
+    SidebarResource.new(SidebarModelClass.new(class_name), model_id)
+  end
+
+  def with_sidebar_resources(resources)
+    original_resources_method = JSAdmin.method(:resources)
+    JSAdmin.define_singleton_method(:resources) { resources }
+
+    yield
+  ensure
+    JSAdmin.define_singleton_method(:resources, original_resources_method)
+  end
 end

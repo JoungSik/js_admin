@@ -4,9 +4,10 @@ module JSAdmin
     before_action :set_record, only: %i[show edit update destroy]
 
     def index
-      @page = [ params.fetch(:page, 1).to_i, 1 ].max
-      @records = @resource.records(page: @page)
       @total_count = @resource.count
+      @total_pages = @resource.total_pages(total_count: @total_count)
+      @page = [ [ params.fetch(:page, 1).to_i, 1 ].max, @total_pages ].min
+      @records = @resource.records(page: @page)
     end
 
     def show

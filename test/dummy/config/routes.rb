@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount JSAdmin::Engine => "/js_admin"
+  mount JSAdmin::Engine => "/admin"
 end

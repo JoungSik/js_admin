@@ -1,12 +1,12 @@
 <% content_for :title, "New #{@resource.singular_label}" %>
 
-<div class="mb-6">
-  <div class="mb-2 text-sm text-slate-500">
-    <%= link_to "Models", root_path, class: "hover:text-slate-950" %> /
-    <%= link_to @resource.label, resources_path(@resource.model_id), class: "hover:text-slate-950" %> /
+<div class="mb-8">
+  <div class="mb-2 text-sm text-slate-500 dark:text-slate-400">
+    <%= link_to "Home", root_path, class: "hover:text-slate-950 dark:hover:text-slate-100" %> /
+    <%= link_to @resource.label, resources_path(@resource.model_id), class: "hover:text-slate-950 dark:hover:text-slate-100" %> /
     New
   </div>
-  <h1 class="text-2xl font-semibold text-slate-950">New <%= @resource.singular_label %></h1>
+  <h1 class="text-2xl font-semibold text-slate-950 dark:text-slate-100">New <%= @resource.singular_label %></h1>
 </div>
 
 <%= render "form", record: @record, resource: @resource, url: resources_path(@resource.model_id) %>
