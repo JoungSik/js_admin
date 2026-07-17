@@ -30,7 +30,10 @@ class NavigationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "body[data-controller='js-admin-theme']"
     assert_select "script[type='importmap']", text: /"js_admin"/
+    assert_select "script[type='importmap']", text: %r{"js_admin/controllers/theme_controller"}
+    assert_select "script[type='importmap']", text: %r{"js_admin/controllers/flash_controller"}
     assert_select "script[type='module']", text: /import "js_admin"/
+    assert_no_match "localStorage.getItem", response.body
     assert_select "turbo-frame#js_admin_content[data-turbo-action='advance']"
     assert_select "main [data-js-admin-home]", 1
     assert_select "main a", 0
@@ -41,6 +44,16 @@ class NavigationTest < ActionDispatch::IntegrationTest
     assert_select "header.fixed.top-0"
     assert_select "div.pt-16"
     assert_select "aside.lg\\:top-16"
+  end
+
+  test "renders saved dark theme without inline theme javascript" do
+    get "/admin", headers: {
+      "Cookie" => "js_admin_theme=dark"
+    }
+
+    assert_response :success
+    assert_select "html.dark"
+    assert_no_match "localStorage.getItem", response.body
   end
 
   test "groups namespaced resources in sidebar dropdowns" do

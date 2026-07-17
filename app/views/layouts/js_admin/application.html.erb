@@ -1,29 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html class="<%= js_admin_html_classes %>">
 <head>
   <title><%= content_for(:title) || "JSAdmin" %></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
-
-  <%= javascript_tag nonce: true do %>
-    (function() {
-      var storageKey = "js_admin_theme";
-      var storedTheme = null;
-
-      try {
-        storedTheme = localStorage.getItem(storageKey);
-      } catch (error) {
-        storedTheme = null;
-      }
-
-      var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      var darkEnabled = storedTheme === "dark" || (!storedTheme && prefersDark);
-
-      document.documentElement.classList.toggle("dark", darkEnabled);
-    })();
-  <% end %>
 
   <%= yield :head %>
 
