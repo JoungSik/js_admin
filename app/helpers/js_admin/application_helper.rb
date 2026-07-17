@@ -1,5 +1,9 @@
 module JSAdmin
   module ApplicationHelper
+    CONTENT_FRAME_ID = "js_admin_content"
+    CONTENT_BODY_ID = "js_admin_content_body"
+    FLASH_ID = "js_admin_flash"
+
     TEXT_INPUT_CLASSES = [
       "w-full rounded-md border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-950 shadow-sm",
       "placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200",
@@ -139,6 +143,31 @@ module JSAdmin
       FORM_ERROR_CLASSES
     end
 
+    def js_admin_content_frame_id
+      CONTENT_FRAME_ID
+    end
+
+    def js_admin_content_body_id
+      CONTENT_BODY_ID
+    end
+
+    def js_admin_flash_id
+      FLASH_ID
+    end
+
+    def js_admin_content_frame_data
+      {
+        turbo_action: "advance"
+      }
+    end
+
+    def js_admin_content_link_data
+      {
+        turbo_frame: js_admin_content_frame_id,
+        turbo_action: "advance"
+      }
+    end
+
     def js_admin_table_value(field, record)
       value = field.formatted_value(record)
       classes = value == "NULL" ? "text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-200"
@@ -202,12 +231,10 @@ module JSAdmin
       stylesheet_link_tag logical_name, "data-turbo-track": "reload"
     end
 
-    def js_admin_hotwire_javascript_tags
-      if respond_to?(:javascript_importmap_tags) && Rails.root.join("config/importmap.rb").exist?
-        javascript_importmap_tags
-      elsif js_admin_asset_exists?("application.js")
-        javascript_include_tag "application", type: "module", "data-turbo-track": "reload"
-      end
+    def js_admin_javascript_tags
+      return unless respond_to?(:javascript_importmap_tags)
+
+      javascript_importmap_tags "js_admin"
     end
 
     def js_admin_asset_exists?(logical_path)

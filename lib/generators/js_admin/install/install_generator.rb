@@ -3,6 +3,12 @@ require "rails/generators"
 module JSAdmin
   module Generators
     class InstallGenerator < Rails::Generators::Base
+      IMPORTMAP_PINS = {
+        "@hotwired/turbo-rails" => 'pin "@hotwired/turbo-rails", to: "turbo.min.js"',
+        "@hotwired/stimulus" => 'pin "@hotwired/stimulus", to: "stimulus.min.js"',
+        "js_admin" => 'pin "js_admin", to: "js_admin/application.js", preload: true'
+      }.freeze
+
       namespace "js_admin:install"
 
       class_option :path,
@@ -36,14 +42,38 @@ module JSAdmin
         RUBY
       end
 
+      def pin_importmap_modules
+        importmap_path = application_path("config/importmap.rb")
+
+        unless File.exist?(importmap_path)
+          say_status :warning, "config/importmap.rb was not found. Run bin/rails importmap:install, then rerun js_admin:install.", :yellow
+          return
+        end
+
+        importmap = File.read(importmap_path)
+        missing_pins = IMPORTMAP_PINS.filter_map do |name, line|
+          line unless importmap.match?(/^\s*pin\s+["']#{Regexp.escape(name)}["']/)
+        end
+
+        return if missing_pins.empty?
+
+        append_to_file importmap_path, "\n#{missing_pins.join("\n")}\n"
+      end
+
       def import_tailwind_engine_styles
-        tailwind_entrypoint = Rails.root.join("app/assets/tailwind/application.css")
-        return unless tailwind_entrypoint.exist?
+        tailwind_entrypoint = application_path("app/assets/tailwind/application.css")
+        return unless File.exist?(tailwind_entrypoint)
 
         import_line = '@import "../builds/tailwind/js_admin";'
-        return if tailwind_entrypoint.read.include?(import_line)
+        return if File.read(tailwind_entrypoint).include?(import_line)
 
         append_to_file tailwind_entrypoint, "\n#{import_line}\n"
+      end
+
+      private
+
+      def application_path(relative_path)
+        File.join(destination_root, relative_path)
       end
     end
   end

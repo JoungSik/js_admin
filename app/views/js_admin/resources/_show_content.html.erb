@@ -1,0 +1,26 @@
+<div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <div class="mb-2 text-sm text-slate-500 dark:text-slate-400">
+      <%= link_to "Home", root_path, class: "hover:text-slate-950 dark:hover:text-slate-100" %> /
+      <%= link_to @resource.label, resources_path(@resource.model_id), class: "hover:text-slate-950 dark:hover:text-slate-100" %> /
+      <%= @resource.display_name(@record) %>
+    </div>
+    <h1 class="text-2xl font-semibold text-slate-950 dark:text-slate-100"><%= @resource.display_name(@record) %></h1>
+  </div>
+
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_resource_path(@resource.model_id, @record), class: "inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" %>
+    <%= button_to "Delete", resource_path(@resource.model_id, @record), method: :delete, form: { data: { turbo_confirm: "Delete this record?" } }, class: "inline-flex items-center justify-center rounded-md bg-rose-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-400" %>
+  </div>
+</div>
+
+<div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+  <dl class="divide-y divide-slate-200 dark:divide-slate-800">
+    <% @resource.fields.each do |field| %>
+      <div class="grid gap-3 px-5 py-5 sm:grid-cols-12 sm:gap-6 sm:px-6">
+        <dt class="text-sm font-medium text-slate-600 dark:text-slate-300 sm:col-span-4"><%= field.human_name %></dt>
+        <dd class="text-sm text-slate-950 dark:text-slate-100 sm:col-span-8"><%= js_admin_table_value(field, @record) %></dd>
+      </div>
+    <% end %>
+  </dl>
+</div>

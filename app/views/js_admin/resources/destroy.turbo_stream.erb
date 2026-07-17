@@ -1,0 +1,7 @@
+<%= turbo_stream.update js_admin_flash_id do %>
+  <%= render "layouts/js_admin/flash_messages", notice: notice, alert: alert %>
+<% end %>
+
+<%= turbo_stream.update js_admin_content_body_id do %>
+  <%= render "index_content" %>
+<% end %>
