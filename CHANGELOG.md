@@ -4,6 +4,7 @@
 
 - Change the default mount path to `/admin`.
 - Add optional HTTP Basic Auth configuration.
+- Generate a commented `config/initializers/js_admin.rb` during installation.
 - Add sidebar model navigation with namespace grouping.
 - Add fixed header/sidebar layout, dark mode support, and improved Tailwind UI spacing.
 - Add compact pagination controls and set the default page size to 10 records.
