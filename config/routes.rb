@@ -1,6 +1,7 @@
 JSAdmin::Engine.routes.draw do
-  root to: "models#index"
+  root to: "home#index"
 
+  get "/models", to: "models#index", as: :models
   get "/:model_id", to: "resources#index", as: :resources
   get "/:model_id/new", to: "resources#new", as: :new_resource
   post "/:model_id", to: "resources#create"

@@ -3,8 +3,12 @@ require "rails/generators"
 module JSAdmin
   module Generators
     class InstallGenerator < Rails::Generators::Base
-      class_option :path, type: :string, default: "/js_admin",
-        desc: "Mount path for JSAdmin"
+      namespace "js_admin:install"
+
+      class_option :path,
+                   type: :string,
+                   default: "/admin",
+                   desc: "Mount path for JSAdmin"
 
       def mount_engine
         route %(mount JSAdmin::Engine => "#{options[:path]}")

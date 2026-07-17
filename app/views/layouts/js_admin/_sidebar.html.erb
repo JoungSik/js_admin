@@ -1,0 +1,36 @@
+<aside class="flex shrink-0 flex-col border-b border-slate-200 bg-white/80 dark:border-slate-800 dark:bg-slate-900/70 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:w-64 lg:self-start lg:overflow-hidden lg:border-b-0 lg:border-r">
+  <nav class="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-6 sm:px-8 lg:px-5">
+    <section>
+      <div class="space-y-1">
+        <% js_admin_sidebar_top_level_resources.each do |resource| %>
+          <%= link_to js_admin_sidebar_resource_label(resource), resources_path(resource.model_id), class: js_admin_sidebar_link_classes(resource), data: { js_admin_sidebar_link: resource.model_id } %>
+        <% end %>
+
+        <% js_admin_sidebar_namespace_groups.each do |namespace, resources| %>
+          <details class="group" <%= "open" if js_admin_sidebar_namespace_open?(resources) %>>
+            <summary class="flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100">
+              <span><%= js_admin_sidebar_namespace_label(namespace) %></span>
+              <span class="transition-transform group-open:rotate-90">&gt;</span>
+            </summary>
+
+            <div class="mt-1 space-y-1 pl-3">
+              <% resources.each do |resource| %>
+                <%= link_to js_admin_sidebar_resource_label(resource), resources_path(resource.model_id), class: js_admin_sidebar_link_classes(resource), data: { js_admin_sidebar_link: resource.model_id } %>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    </section>
+  </nav>
+
+  <div class="shrink-0 border-t border-slate-200 px-5 py-4 dark:border-slate-800 sm:px-8 lg:px-5">
+    <button type="button" data-js-admin-theme-toggle class="inline-flex h-9 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" aria-label="Toggle dark mode" aria-pressed="false">
+      <span class="flex items-center gap-2">
+        <span class="h-2.5 w-2.5 rounded-full bg-slate-500 dark:bg-amber-300"></span>
+        <span>Theme</span>
+      </span>
+      <span class="text-xs text-slate-400 dark:text-slate-500">Toggle</span>
+    </button>
+  </div>
+</aside>

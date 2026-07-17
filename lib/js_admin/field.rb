@@ -67,8 +67,8 @@ module JSAdmin
 
     def belongs_to_association
       @belongs_to_association ||= resource.model_class
-        .reflect_on_all_associations(:belongs_to)
-        .find { |association| association.foreign_key.to_s == name }
+                                          .reflect_on_all_associations(:belongs_to)
+                                          .find { |association| association.foreign_key.to_s == name }
     rescue NameError
       nil
     end
@@ -79,8 +79,8 @@ module JSAdmin
 
       association_resource = Resource.new(association.klass)
       association.klass
-        .limit(JSAdmin.configuration.association_limit)
-        .map { |record| [ association_resource.display_name(record), record.id ] }
+                 .limit(JSAdmin.configuration.association_limit)
+                 .map { |record| [ association_resource.display_name(record), record.id ] }
     rescue ActiveRecord::ActiveRecordError, NameError
       []
     end

@@ -1,22 +1,29 @@
-<%= form_with model: record, url: url, class: "space-y-6" do |form| %>
-  <% if record.errors.any? %>
-    <div class="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-      <p class="font-medium"><%= pluralize(record.errors.count, "error") %> prevented this record from being saved.</p>
-      <ul class="mt-2 list-disc space-y-1 pl-5">
-        <% record.errors.full_messages.each do |message| %>
+<%= form_with model: record, url: url, class: "space-y-7" do |form| %>
+  <% form_errors = js_admin_form_errors(record, resource) %>
+
+  <% if form_errors.any? %>
+    <div class="<%= js_admin_form_error_classes %>" role="alert">
+      <ul class="list-disc space-y-1 pl-5">
+        <% form_errors.each do |message| %>
           <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div class="rounded-lg border border-slate-200 bg-white shadow-sm">
-    <div class="divide-y divide-slate-200">
+  <div class="rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div class="divide-y divide-slate-200 dark:divide-slate-800">
       <% resource.editable_fields.each do |field| %>
-        <div class="grid gap-2 px-4 py-4 sm:grid-cols-3">
-          <%= form.label field.name, field.human_name, class: "text-sm font-medium text-slate-700" %>
-          <div class="sm:col-span-2">
+        <% field_errors = js_admin_field_errors(record, field) %>
+
+        <div class="grid gap-3 px-5 py-5 sm:grid-cols-12 sm:gap-6 sm:px-6">
+          <%= tag.label field.human_name, for: js_admin_field_id(form, field), class: js_admin_field_label_classes(record, field) %>
+          <div class="sm:col-span-8">
             <%= js_admin_field_input(form, field) %>
+
+            <% if field_errors.any? %>
+              <p id="<%= js_admin_field_error_id(form, field) %>" class="<%= js_admin_field_error_text_classes %>"><%= field_errors.to_sentence %></p>
+            <% end %>
           </div>
         </div>
       <% end %>
@@ -24,7 +31,7 @@
   </div>
 
   <div class="flex items-center gap-2">
-    <%= form.submit class: "inline-flex items-center justify-center rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-700" %>
-    <%= link_to "Cancel", record.persisted? ? resource_path(resource.model_id, record) : resources_path(resource.model_id), class: "inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50" %>
+    <%= form.submit class: "inline-flex items-center justify-center rounded-md bg-sky-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-400" %>
+    <%= link_to "Cancel", record.persisted? ? resource_path(resource.model_id, record) : resources_path(resource.model_id), class: "inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" %>
   </div>
 <% end %>

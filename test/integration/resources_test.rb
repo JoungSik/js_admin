@@ -5,6 +5,10 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     JSAdmin.configure do |config|
       config.included_models = [ "Category", "Product" ]
       config.excluded_models = []
+      config.records_per_page = 25
+      config.basic_auth_username = nil
+      config.basic_auth_password = nil
+      config.basic_auth_realm = "JSAdmin"
     end
 
     @category = Category.create!(name: "Books")
@@ -26,19 +30,24 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     JSAdmin.configure do |config|
       config.included_models = []
       config.excluded_models = []
+      config.records_per_page = 25
+      config.basic_auth_username = nil
+      config.basic_auth_password = nil
+      config.basic_auth_realm = "JSAdmin"
     end
   end
 
-  test "lists configured active record models" do
-    get "/js_admin"
+  test "renders configured active record models in sidebar" do
+    get "/admin"
 
     assert_response :success
-    assert_select "a", text: /Product/
-    assert_select "a", text: /Category/
+    assert_select "main [data-js-admin-home]", 1
+    assert_select "aside a", text: /Product/
+    assert_select "aside a", text: /Category/
   end
 
   test "renders column based form inputs" do
-    get "/js_admin/product/new"
+    get "/admin/product/new"
 
     assert_response :success
     assert_select 'input[name="product[name]"]'
@@ -51,7 +60,7 @@ class ResourcesTest < ActionDispatch::IntegrationTest
 
   test "creates a record through generic crud" do
     assert_difference "Product.count", 1 do
-      post "/js_admin/product", params: {
+      post "/admin/product", params: {
         product: {
           category_id: @category.id,
           name: "New Rails",
@@ -65,13 +74,36 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     end
 
     created_product = Product.order(:id).last
-    assert_redirected_to "/js_admin/product/#{created_product.id}"
+    assert_redirected_to "/admin/product/#{created_product.id}"
     assert_equal "New Rails", created_product.name
     assert_equal "draft", created_product.status
   end
 
+  test "renders validation errors inline in the form" do
+    assert_no_difference "Product.count" do
+      post "/admin/product", params: {
+        product: {
+          category_id: @category.id,
+          name: "",
+          description: "Missing name",
+          price: "29.90",
+          available: "1",
+          status: "draft",
+          released_on: "2026-07-10"
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "[data-js-admin-flash]", 0
+    assert_select ".field_with_errors", 0
+    assert_select "label[for='product_name']", text: "Name"
+    assert_select "input[name='product[name]'][id='product_name'][aria-invalid='true'][aria-describedby='product_name_error']"
+    assert_select "p#product_name_error", text: /can't be blank/
+  end
+
   test "updates a record through generic crud" do
-    patch "/js_admin/product/#{@product.id}", params: {
+    patch "/admin/product/#{@product.id}", params: {
       product: {
         category_id: @category.id,
         name: "Updated Rails",
@@ -83,16 +115,82 @@ class ResourcesTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to "/js_admin/product/#{@product.id}"
+    assert_redirected_to "/admin/product/#{@product.id}"
     assert_equal "Updated Rails", @product.reload.name
     assert_not @product.available
   end
 
   test "deletes a record through generic crud" do
     assert_difference "Product.count", -1 do
-      delete "/js_admin/product/#{@product.id}"
+      delete "/admin/product/#{@product.id}"
     end
 
-    assert_redirected_to "/js_admin/product"
+    assert_redirected_to "/admin/product"
+  end
+
+  test "renders view edit and delete row actions" do
+    get "/admin/product"
+
+    assert_response :success
+    assert_select "a", text: "View"
+    assert_select "a", text: "Edit"
+    assert_select "button", text: "Delete"
+    assert_select "a", text: "Open", count: 0
+  end
+
+  test "renders compact pagination controls" do
+    JSAdmin.configure do |config|
+      config.records_per_page = 1
+    end
+
+    2.times do |index|
+      Product.create!(
+        category: @category,
+        name: "Paginated Product #{index + 1}",
+        description: "Pagination fixture",
+        price: 9.99,
+        available: true,
+        status: :draft,
+        released_on: Date.new(2026, 7, 12)
+      )
+    end
+
+    get "/admin/product"
+
+    assert_response :success
+    assert_select "nav[aria-label='Pagination']"
+    assert_select "div", text: /Page 1 of 3/, count: 0
+    assert_select "span[aria-disabled='true']", text: "First"
+    assert_select "span[aria-disabled='true']", text: "Previous"
+    assert_select "span[aria-current='page'][aria-label='Page 1 of 3']", text: "1 / 3"
+    assert_select "a[href='/admin/product?page=2']", text: "Next"
+    assert_select "a[href='/admin/product?page=3']", text: "Last"
+    assert_select "nav[aria-label='Pagination']", text: /\.\.\./, count: 0
+  end
+
+  test "requires basic auth when configured" do
+    JSAdmin.configure do |config|
+      config.basic_auth_username = "admin"
+      config.basic_auth_password = "secret"
+    end
+
+    get "/admin"
+
+    assert_response :unauthorized
+    assert_includes response.headers["WWW-Authenticate"], 'Basic realm="JSAdmin"'
+  end
+
+  test "allows requests with valid basic auth credentials" do
+    JSAdmin.configure do |config|
+      config.basic_auth_username = "admin"
+      config.basic_auth_password = "secret"
+    end
+
+    get "/admin", headers: {
+      "Authorization" => ActionController::HttpAuthentication::Basic.encode_credentials("admin", "secret")
+    }
+
+    assert_response :success
+    assert_select "aside a", text: /Product/
   end
 end
