@@ -11,6 +11,8 @@ class NavigationTest < ActionDispatch::IntegrationTest
       config.basic_auth_username = nil
       config.basic_auth_password = nil
       config.basic_auth_realm = "JSAdmin"
+      config.authenticate_with
+      config.authorize_with
     end
   end
 
@@ -21,6 +23,8 @@ class NavigationTest < ActionDispatch::IntegrationTest
       config.basic_auth_username = nil
       config.basic_auth_password = nil
       config.basic_auth_realm = "JSAdmin"
+      config.authenticate_with
+      config.authorize_with
     end
   end
 

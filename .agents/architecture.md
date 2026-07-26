@@ -8,7 +8,7 @@ JSAdmin은 Rails mountable engine gem입니다. host app 모델을 직접 생성
 - Ruby namespace: `JSAdmin`
 - 기본 mount path: `/admin`
 - Runtime dependencies: `rails`, `importmap-rails`, `tailwindcss-rails`, `turbo-rails`, `stimulus-rails`
-- optional Basic Auth는 `JSAdmin.configuration`에서 제공합니다. 더 강한 인증/인가가 필요하면 host app의 admin authentication constraint 뒤에 mount합니다.
+- 인증은 미설정, Basic Auth, host application callback 중 하나를 사용합니다. Basic Auth와 callback을 동시에 설정하지 않습니다.
 - 기본 pagination size는 10 records입니다.
 
 ## 주요 구조
@@ -25,6 +25,8 @@ JSAdmin은 Rails mountable engine gem입니다. host app 모델을 직접 생성
 - `app/assets/tailwind/js_admin/engine.css`: engine Tailwind entrypoint
 - `lib/generators/js_admin/install/install_generator.rb`: route mount, importmap pin, Tailwind import generator
 - `JSAdmin::Configuration#basic_auth_enabled?`: username/password 설정 시 Basic Auth 활성화
+- `JSAdmin::Configuration#authenticate_with`: host application 인증 callback 등록
+- `JSAdmin::Configuration#authorize_with`: 인증된 사용자의 JSAdmin 접근 권한 callback 등록
 
 ## Naming
 

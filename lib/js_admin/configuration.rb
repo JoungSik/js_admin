@@ -9,6 +9,8 @@ module JSAdmin
                   :basic_auth_password,
                   :basic_auth_realm
 
+    attr_reader :authentication_callback, :authorization_callback
+
     def initialize
       @included_models = []
       @excluded_models = []
@@ -18,6 +20,8 @@ module JSAdmin
       @basic_auth_username = nil
       @basic_auth_password = nil
       @basic_auth_realm = "JSAdmin"
+      @authentication_callback = nil
+      @authorization_callback = nil
     end
 
     def include_models(*models)
@@ -29,10 +33,61 @@ module JSAdmin
     end
 
     def basic_auth_enabled?
-      basic_auth_username.to_s != "" && basic_auth_password.to_s != ""
+      basic_auth_username_configured? && basic_auth_password_configured?
+    end
+
+    def authenticate_with(&callback)
+      @authentication_callback = callback
+    end
+
+    def authorize_with(&callback)
+      @authorization_callback = callback
+    end
+
+    def authentication_strategy
+      validate!
+
+      return :callback if authentication_callback
+      return :basic_auth if basic_auth_enabled?
+
+      :none
+    end
+
+    def validate!
+      validate_basic_auth_credentials!
+      validate_authentication_strategy!
+      validate_authorization_callback!
+
+      self
     end
 
     private
+
+    def validate_basic_auth_credentials!
+      return if basic_auth_username_configured? == basic_auth_password_configured?
+
+      raise ConfigurationError, I18n.t("js_admin.configuration.errors.incomplete_basic_auth")
+    end
+
+    def validate_authentication_strategy!
+      return unless basic_auth_enabled? && authentication_callback
+
+      raise ConfigurationError, I18n.t("js_admin.configuration.errors.multiple_authentication_strategies")
+    end
+
+    def validate_authorization_callback!
+      return unless authorization_callback && !authentication_callback
+
+      raise ConfigurationError, I18n.t("js_admin.configuration.errors.authorization_without_authentication")
+    end
+
+    def basic_auth_username_configured?
+      basic_auth_username.to_s != ""
+    end
+
+    def basic_auth_password_configured?
+      basic_auth_password.to_s != ""
+    end
 
     def normalize_model_names(models)
       models.flatten.map { |model| model.is_a?(Class) ? model.name : model.to_s }

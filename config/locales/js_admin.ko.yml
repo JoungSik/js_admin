@@ -1,0 +1,7 @@
+ko:
+  js_admin:
+    configuration:
+      errors:
+        incomplete_basic_auth: "Basic Auth username과 password를 모두 설정해야 합니다."
+        multiple_authentication_strategies: "Basic Auth와 authenticate_with는 동시에 설정할 수 없습니다."
+        authorization_without_authentication: "authorize_with를 사용하려면 authenticate_with가 필요합니다."

@@ -40,6 +40,10 @@ module JSAdmin
             # config.basic_auth_username = ENV["JS_ADMIN_BASIC_AUTH_USERNAME"]
             # config.basic_auth_password = ENV["JS_ADMIN_BASIC_AUTH_PASSWORD"]
             # config.basic_auth_realm = "JSAdmin"
+
+            # Or delegate authentication and authorization to the host application.
+            # config.authenticate_with { authenticate_user! }
+            # config.authorize_with { current_user&.admin? }
           end
         RUBY
       end

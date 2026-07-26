@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add host application authentication and authorization callbacks as an alternative to Basic Auth.
+- Reject conflicting or incomplete authentication configuration with localized errors.
+
 ## 0.1.0 - 2026-07-18
 
 - Change the default mount path to `/admin`.
