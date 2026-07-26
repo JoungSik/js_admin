@@ -98,11 +98,11 @@ module JSAdmin
 
       case value
       when nil
-        "NULL"
+        I18n.t("js_admin.values.null")
       when true
-        "true"
+        I18n.t("js_admin.values.true")
       when false
-        "false"
+        I18n.t("js_admin.values.false")
       else
         value.to_s
       end

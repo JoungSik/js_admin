@@ -1,4 +1,4 @@
-<% content_for :title, "Edit #{@resource.display_name(@record)}" %>
+<% content_for :title, t("js_admin.titles.edit", record: @resource.display_name(@record)) %>
 
 <%= render layout: "layouts/js_admin/content_frame" do %>
   <%= render "edit_content" %>

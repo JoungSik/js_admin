@@ -9,6 +9,7 @@
 - 작고 집중된 변경을 선호하고, 불필요한 리팩터링이나 formatting churn을 피합니다.
 - Gem name은 `js_admin`, Ruby namespace는 `JSAdmin`입니다. 명시 요청 없이 이름을 바꾸지 않습니다.
 - `JSAdmin` 상수를 유지하기 위해 `JS` acronym 설정을 신중히 다룹니다.
+- JSAdmin이 직접 노출하는 사용자-facing 문자열은 hardcode하지 않고 `js_admin.*` I18n key로 관리하며 `en`/`ko` locale을 함께 갱신합니다.
 - 사용자가 명시적으로 요청하지 않으면 commit 또는 push하지 않습니다.
 - `git push --force`와 `git push --force-with-lease`는 사용하지 않습니다.
 - commit message는 `git commit -m "<type>: <Korean summary>"` 형식의 한 줄로 작성합니다.

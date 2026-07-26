@@ -10,6 +10,7 @@ JSAdmin은 Rails mountable engine gem입니다. host app 모델을 직접 생성
 - Runtime dependencies: `rails`, `importmap-rails`, `tailwindcss-rails`, `turbo-rails`, `stimulus-rails`
 - 인증은 미설정, Basic Auth, host application callback 중 하나를 사용합니다. Basic Auth와 callback을 동시에 설정하지 않습니다.
 - 기본 pagination size는 10 records입니다.
+- JSAdmin 소유의 사용자-facing 문자열은 `js_admin.*` I18n namespace에서 관리하고 `en`/`ko` locale을 기본 제공합니다.
 
 ## 주요 구조
 
@@ -33,6 +34,16 @@ JSAdmin은 Rails mountable engine gem입니다. host app 모델을 직접 생성
 파일, 경로, gem name, generator name은 `js_admin`을 사용합니다.
 
 Ruby 상수는 `JSAdmin`을 사용합니다. `lib/js_admin/engine.rb`의 inflection 설정이 깨지면 Zeitwerk autoload가 실패할 수 있습니다.
+
+## I18n
+
+- JSAdmin이 직접 표시하는 UI title, navigation, button, table, pagination, confirmation, accessibility label, flash, 설정 오류, generator 메시지는 문자열을 hardcode하지 않고 `js_admin.*` key를 사용합니다.
+- 새 key를 추가하거나 기존 문구를 변경할 때 `config/locales/js_admin.en.yml`과 `config/locales/js_admin.ko.yml`을 함께 갱신하고 두 locale의 key 구조를 일치시킵니다.
+- 동적 모델명, record명, count는 문자열 결합 대신 interpolation을 사용합니다. 수량 문구는 `count`를 전달해 pluralization을 적용하고, 표시 형식이 필요하면 `formatted_count`처럼 별도 값을 전달합니다.
+- 모델명과 attribute명은 host app의 번역을 존중하도록 `model_name.human`과 `human_attribute_name`을 사용합니다.
+- Active Model validation message는 host app과 Rails I18n이 소유하므로 JSAdmin locale에 중복 정의하지 않고 record의 `errors`를 표시합니다.
+- `JSAdmin`, class/module/API 이름, file path, HTML attribute 값처럼 번역 대상이 아닌 기술 식별자는 원문을 유지합니다.
+- I18n 변경에는 기본 locale 동작과 지원 locale 중 하나 이상의 렌더링 또는 오류 메시지 테스트를 포함합니다.
 
 ## CRUD 설계
 

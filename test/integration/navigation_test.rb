@@ -2,7 +2,7 @@ require "test_helper"
 
 class NavigationTest < ActionDispatch::IntegrationTest
   SidebarModelClass = Struct.new(:name)
-  SidebarResource = Struct.new(:model_class, :model_id)
+  SidebarResource = Struct.new(:model_class, :model_id, :singular_label)
 
   setup do
     JSAdmin.configure do |config|
@@ -88,7 +88,8 @@ class NavigationTest < ActionDispatch::IntegrationTest
   private
 
   def sidebar_resource(class_name, model_id)
-    SidebarResource.new(SidebarModelClass.new(class_name), model_id)
+    singular_label = class_name.demodulize.underscore.humanize
+    SidebarResource.new(SidebarModelClass.new(class_name), model_id, singular_label)
   end
 
   def with_sidebar_resources(resources)

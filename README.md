@@ -133,6 +133,21 @@ together. Partial Basic Auth credentials and `authorize_with` without
 For production apps, you can alternatively mount JSAdmin inside the host
 application's admin authentication constraint.
 
+## Internationalization
+
+JSAdmin follows the host application's `I18n.locale`.
+
+Supported locales:
+
+| Locale | Language |
+| --- | --- |
+| `en` | English |
+| `ko` | 한국어 |
+
+The translations cover the interface, CRUD notices, configuration errors, and
+generator messages. Host applications can override any key under the
+`js_admin` namespace.
+
 ## Field Mapping
 
 JSAdmin maps database columns to inputs automatically:
