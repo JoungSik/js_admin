@@ -241,4 +241,29 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "renders js_admin interface using current locale" do
+    I18n.with_locale(:ko) do
+      get "/admin/product"
+    end
+
+    assert_response :success
+    assert_select "a", text: "홈"
+    assert_select "th", text: "작업"
+    assert_select "a", text: "보기"
+    assert_select "a", text: "편집"
+    assert_select "button", text: "삭제"
+    assert_select "nav[aria-label='페이지 탐색']"
+    assert_select "span", text: "참"
+  end
+
+  test "renders localized crud notice" do
+    I18n.with_locale(:ko) do
+      delete "/admin/product/#{@product.id}", headers: {
+        "Accept" => "text/vnd.turbo-stream.html"
+      }
+    end
+
+    assert_response :success
+    assert_includes response.body, "Product 레코드를 삭제했습니다."
+  end
 end

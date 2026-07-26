@@ -16,7 +16,7 @@ module JSAdmin
       class_option :path,
                    type: :string,
                    default: "/admin",
-                   desc: "Mount path for JSAdmin"
+                   desc: I18n.t("js_admin.generator.options.path")
 
       def mount_engine
         route %(mount JSAdmin::Engine => "#{options[:path]}")
@@ -52,7 +52,7 @@ module JSAdmin
         importmap_path = application_path("config/importmap.rb")
 
         unless File.exist?(importmap_path)
-          say_status :warning, "config/importmap.rb was not found. Run bin/rails importmap:install, then rerun js_admin:install.", :yellow
+          say_status :warning, I18n.t("js_admin.generator.warnings.importmap_missing"), :yellow
           return
         end
 

@@ -171,7 +171,11 @@ module JSAdmin
 
     def js_admin_table_value(field, record)
       value = field.formatted_value(record)
-      classes = value == "NULL" ? "text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-200"
+      classes = if field.value_for(record).nil?
+        "text-slate-400 dark:text-slate-500"
+      else
+        "text-slate-700 dark:text-slate-200"
+      end
 
       tag.span(truncate(value, length: 80), class: classes)
     end
@@ -189,7 +193,7 @@ module JSAdmin
     end
 
     def js_admin_sidebar_resource_label(resource)
-      resource.model_class.name.demodulize.underscore.humanize
+      resource.singular_label
     end
 
     def js_admin_sidebar_namespace_label(namespace)

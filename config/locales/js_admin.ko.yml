@@ -5,3 +5,61 @@ ko:
         incomplete_basic_auth: "Basic Auth username과 password를 모두 설정해야 합니다."
         multiple_authentication_strategies: "Basic Auth와 authenticate_with는 동시에 설정할 수 없습니다."
         authorization_without_authentication: "authorize_with를 사용하려면 authenticate_with가 필요합니다."
+    generator:
+      options:
+        path: "JSAdmin mount 경로"
+      warnings:
+        importmap_missing: "config/importmap.rb를 찾을 수 없습니다. bin/rails importmap:install 실행 후 js_admin:install을 다시 실행하세요."
+    titles:
+      models: "JSAdmin 모델"
+      new: "새 %{resource}"
+      edit: "%{record} 편집"
+    navigation:
+      home: "홈"
+    models:
+      heading: "모델"
+      available:
+        one: "사용 가능한 모델 %{formatted_count}개"
+        other: "사용 가능한 모델 %{formatted_count}개"
+    resources:
+      notices:
+        created: "%{resource} 레코드를 생성했습니다."
+        updated: "%{resource} 레코드를 수정했습니다."
+        deleted: "%{resource} 레코드를 삭제했습니다."
+      records:
+        one: "레코드 %{formatted_count}개"
+        other: "레코드 %{formatted_count}개"
+      headings:
+        new: "새 %{resource}"
+        edit: "%{record} 편집"
+      actions:
+        create: "%{resource} 생성"
+        update: "%{resource} 저장"
+        new: "새 %{resource}"
+        view: "보기"
+        edit: "편집"
+        delete: "삭제"
+        cancel: "취소"
+      table:
+        actions: "작업"
+        no_records: "레코드가 없습니다"
+      delete_confirmation: "이 레코드를 삭제하시겠습니까?"
+      pagination:
+        label: "페이지 탐색"
+        first: "처음"
+        previous: "이전"
+        next: "다음"
+        last: "마지막"
+        status: "전체 %{total_pages}페이지 중 %{page}페이지"
+    theme:
+      label: "테마"
+      toggle: "전환"
+      toggle_aria_label: "다크 모드 전환"
+    values:
+      null: "NULL"
+      "true": "참"
+      "false": "거짓"
+    resource:
+      fallback_display_name: "%{resource} #%{id}"
+    errors:
+      unknown_resource: "알 수 없는 JSAdmin 리소스입니다: %{model_id}"

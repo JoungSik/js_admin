@@ -18,7 +18,8 @@ module JSAdmin
       @record = @resource.new_record(resource_params)
 
       if @record.save
-        redirect_to resource_path(@resource.model_id, @record), notice: "#{@resource.singular_label} was created."
+        redirect_to resource_path(@resource.model_id, @record),
+                    notice: t("js_admin.resources.notices.created", resource: @resource.singular_label)
       else
         render :new, status: :unprocessable_entity
       end
@@ -29,7 +30,8 @@ module JSAdmin
 
     def update
       if @record.update(resource_params)
-        redirect_to resource_path(@resource.model_id, @record), notice: "#{@resource.singular_label} was updated."
+        redirect_to resource_path(@resource.model_id, @record),
+                    notice: t("js_admin.resources.notices.updated", resource: @resource.singular_label)
       else
         render :edit, status: :unprocessable_entity
       end
@@ -37,7 +39,7 @@ module JSAdmin
 
     def destroy
       @record.destroy
-      message = "#{@resource.singular_label} was deleted."
+      message = t("js_admin.resources.notices.deleted", resource: @resource.singular_label)
 
       respond_to do |format|
         format.turbo_stream do
