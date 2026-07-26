@@ -77,6 +77,8 @@ Available configuration options:
 | `basic_auth_username` | `nil` | HTTP Basic Auth username. Auth is disabled unless username and password are both present. |
 | `basic_auth_password` | `nil` | HTTP Basic Auth password. |
 | `basic_auth_realm` | `"JSAdmin"` | HTTP Basic Auth realm. |
+| `authenticate_with` | `nil` | Controller-context callback delegated to the host application's authentication. |
+| `authorize_with` | `nil` | Optional controller-context callback that returns whether the authenticated user may access JSAdmin. |
 
 Example:
 
@@ -91,9 +93,11 @@ end
 
 ## Authentication
 
-JSAdmin works without authentication unless Basic Auth credentials are
-configured. When both username and password are set, every JSAdmin request
-requires HTTP Basic Auth.
+JSAdmin works without authentication unless Basic Auth credentials or an
+authentication callback are configured. Choose exactly one of the following
+authentication strategies.
+
+For HTTP Basic Auth, configure both username and password:
 
 ```ruby
 # config/initializers/js_admin.rb
@@ -104,8 +108,30 @@ JSAdmin.configure do |config|
 end
 ```
 
-For production apps, you can also mount JSAdmin inside the host application's
-admin authentication constraint when you need app-level authorization.
+To delegate authentication to the host application, provide a callback instead.
+JSAdmin controllers inherit from the host application's `ApplicationController`,
+and the callback runs in the controller context:
+
+```ruby
+# config/initializers/js_admin.rb
+JSAdmin.configure do |config|
+  config.authenticate_with do
+    authenticate_user!
+  end
+
+  config.authorize_with do
+    current_user&.admin?
+  end
+end
+```
+
+`authorize_with` is optional. When configured, returning `false` responds with
+`403 Forbidden`. Basic Auth and `authenticate_with` cannot be configured
+together. Partial Basic Auth credentials and `authorize_with` without
+`authenticate_with` also raise `JSAdmin::ConfigurationError`.
+
+For production apps, you can alternatively mount JSAdmin inside the host
+application's admin authentication constraint.
 
 ## Field Mapping
 

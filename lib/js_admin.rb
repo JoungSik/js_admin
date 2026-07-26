@@ -5,6 +5,7 @@ require "stimulus-rails"
 require "tailwindcss-rails"
 require "turbo-rails"
 
+require "js_admin/configuration_error"
 require "js_admin/configuration"
 require "js_admin/field"
 require "js_admin/registry"
@@ -19,6 +20,7 @@ module JSAdmin
 
     def configure
       yield configuration
+      configuration.validate!
       Registry.reset!
     end
 

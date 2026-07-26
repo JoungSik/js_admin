@@ -9,6 +9,8 @@ class ResourcesTest < ActionDispatch::IntegrationTest
       config.basic_auth_username = nil
       config.basic_auth_password = nil
       config.basic_auth_realm = "JSAdmin"
+      config.authenticate_with
+      config.authorize_with
     end
 
     @category = Category.create!(name: "Books")
@@ -34,6 +36,8 @@ class ResourcesTest < ActionDispatch::IntegrationTest
       config.basic_auth_username = nil
       config.basic_auth_password = nil
       config.basic_auth_realm = "JSAdmin"
+      config.authenticate_with
+      config.authorize_with
     end
   end
 
@@ -209,4 +213,32 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "aside a", text: /Product/
   end
+
+  test "requires authentication through host callback when configured" do
+    JSAdmin.configure do |config|
+      config.authenticate_with do
+        head :unauthorized unless request.headers["X-JSAdmin-User"] == "admin"
+      end
+    end
+
+    get "/admin"
+    assert_response :unauthorized
+
+    get "/admin", headers: { "X-JSAdmin-User" => "admin" }
+    assert_response :success
+  end
+
+  test "returns forbidden when host authorization callback denies access" do
+    JSAdmin.configure do |config|
+      config.authenticate_with { request }
+      config.authorize_with { request.headers["X-JSAdmin-Role"] == "admin" }
+    end
+
+    get "/admin", headers: { "X-JSAdmin-Role" => "member" }
+    assert_response :forbidden
+
+    get "/admin", headers: { "X-JSAdmin-Role" => "admin" }
+    assert_response :success
+  end
+
 end
