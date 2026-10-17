@@ -78,6 +78,7 @@ module JSAdmin
     def belongs_to_association
       @belongs_to_association ||= resource.model_class
                                           .reflect_on_all_associations(:belongs_to)
+                                          .reject(&:polymorphic?)
                                           .find { |association| association.foreign_key.to_s == name }
     rescue NameError
       nil
