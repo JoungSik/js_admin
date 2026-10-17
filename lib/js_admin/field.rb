@@ -36,6 +36,7 @@ module JSAdmin
     end
 
     def input_kind
+      return :configured_select if configured_select?
       return :association_select if belongs_to_association
       return :enum_select if enum?
 
@@ -63,6 +64,15 @@ module JSAdmin
 
     def enum_values
       resource.model_class.defined_enums.fetch(name, {}).keys
+    end
+
+    def configured_select?
+      !configured_select_source.nil?
+    end
+
+    def configured_select_values
+      source = configured_select_source
+      Array(source.respond_to?(:call) ? source.call : source)
     end
 
     def belongs_to_association
@@ -98,17 +108,21 @@ module JSAdmin
 
       case value
       when nil
-        "NULL"
+        I18n.t("js_admin.values.null")
       when true
-        "true"
+        I18n.t("js_admin.values.true")
       when false
-        "false"
+        I18n.t("js_admin.values.false")
       else
         value.to_s
       end
     end
 
     private
+
+    def configured_select_source
+      JSAdmin.configuration.select_options_for(resource.model_class, name)
+    end
 
     def inheritance_column?
       name == resource.model_class.inheritance_column

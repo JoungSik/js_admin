@@ -2,7 +2,7 @@ require "test_helper"
 
 class NavigationTest < ActionDispatch::IntegrationTest
   SidebarModelClass = Struct.new(:name)
-  SidebarResource = Struct.new(:model_class, :model_id)
+  SidebarResource = Struct.new(:model_class, :model_id, :singular_label)
 
   setup do
     JSAdmin.configure do |config|
@@ -11,6 +11,8 @@ class NavigationTest < ActionDispatch::IntegrationTest
       config.basic_auth_username = nil
       config.basic_auth_password = nil
       config.basic_auth_realm = "JSAdmin"
+      config.authenticate_with
+      config.authorize_with
     end
   end
 
@@ -21,6 +23,8 @@ class NavigationTest < ActionDispatch::IntegrationTest
       config.basic_auth_username = nil
       config.basic_auth_password = nil
       config.basic_auth_realm = "JSAdmin"
+      config.authenticate_with
+      config.authorize_with
     end
   end
 
@@ -84,7 +88,8 @@ class NavigationTest < ActionDispatch::IntegrationTest
   private
 
   def sidebar_resource(class_name, model_id)
-    SidebarResource.new(SidebarModelClass.new(class_name), model_id)
+    singular_label = class_name.demodulize.underscore.humanize
+    SidebarResource.new(SidebarModelClass.new(class_name), model_id, singular_label)
   end
 
   def with_sidebar_resources(resources)

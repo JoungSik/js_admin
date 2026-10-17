@@ -69,7 +69,11 @@ module JSAdmin
 
       return record.public_send(display_method).to_s if display_method
 
-      "#{singular_label} ##{record.id}"
+      I18n.t(
+        "js_admin.resource.fallback_display_name",
+        resource: singular_label,
+        id: record.id
+      )
     end
 
     def next_page?(page)

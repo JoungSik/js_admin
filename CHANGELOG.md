@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.2.0 - 2026-10-18
+
+- Add host application authentication and authorization callbacks as an alternative to Basic Auth.
+- Reject conflicting or incomplete authentication configuration with localized errors.
+- Add English and Korean I18n translations for the JSAdmin interface.
+- Add `select_options` configuration to render a column as a select with static or callable choices.
+
 ## 0.1.0 - 2026-07-18
 
 - Change the default mount path to `/admin`.

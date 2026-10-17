@@ -16,7 +16,7 @@ module JSAdmin
       class_option :path,
                    type: :string,
                    default: "/admin",
-                   desc: "Mount path for JSAdmin"
+                   desc: I18n.t("js_admin.generator.options.path")
 
       def mount_engine
         route %(mount JSAdmin::Engine => "#{options[:path]}")
@@ -36,10 +36,17 @@ module JSAdmin
             # Methods tried in order when displaying records in labels and associations.
             # config.display_name_methods = %i[name title email username id]
 
+            # Render a column as a select. Callables are evaluated on every form render.
+            # config.select_options "Post", category: -> { Category.pluck(:name) }
+
             # Basic Auth is disabled unless both username and password are present.
             # config.basic_auth_username = ENV["JS_ADMIN_BASIC_AUTH_USERNAME"]
             # config.basic_auth_password = ENV["JS_ADMIN_BASIC_AUTH_PASSWORD"]
             # config.basic_auth_realm = "JSAdmin"
+
+            # Or delegate authentication and authorization to the host application.
+            # config.authenticate_with { authenticate_user! }
+            # config.authorize_with { current_user&.admin? }
           end
         RUBY
       end
@@ -48,7 +55,7 @@ module JSAdmin
         importmap_path = application_path("config/importmap.rb")
 
         unless File.exist?(importmap_path)
-          say_status :warning, "config/importmap.rb was not found. Run bin/rails importmap:install, then rerun js_admin:install.", :yellow
+          say_status :warning, I18n.t("js_admin.generator.warnings.importmap_missing"), :yellow
           return
         end
 

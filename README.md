@@ -74,9 +74,12 @@ Available configuration options:
 | `records_per_page` | `10` | Number of records shown per resource index page. |
 | `association_limit` | `100` | Maximum number of associated records loaded into a `belongs_to` select. |
 | `display_name_methods` | `%i[name title email username id]` | Methods tried in order when displaying records in tables and select labels. |
+| `field_select_options` | `{}` | Select choices by model and column. Register them with `select_options`. |
 | `basic_auth_username` | `nil` | HTTP Basic Auth username. Auth is disabled unless username and password are both present. |
 | `basic_auth_password` | `nil` | HTTP Basic Auth password. |
 | `basic_auth_realm` | `"JSAdmin"` | HTTP Basic Auth realm. |
+| `authenticate_with` | `nil` | Controller-context callback delegated to the host application's authentication. |
+| `authorize_with` | `nil` | Optional controller-context callback that returns whether the authenticated user may access JSAdmin. |
 
 Example:
 
@@ -86,14 +89,21 @@ JSAdmin.configure do |config|
   config.include_models User, Post
   config.exclude_models AuditLog
   config.records_per_page = 10
+  config.select_options "Post", category: -> { Category.pluck(:name) }
 end
 ```
 
+`select_options` renders the column as a select. Pass an array or a callable;
+callables are evaluated each time the form renders. Choices can be values or
+`[label, value]` pairs.
+
 ## Authentication
 
-JSAdmin works without authentication unless Basic Auth credentials are
-configured. When both username and password are set, every JSAdmin request
-requires HTTP Basic Auth.
+JSAdmin works without authentication unless Basic Auth credentials or an
+authentication callback are configured. Choose exactly one of the following
+authentication strategies.
+
+For HTTP Basic Auth, configure both username and password:
 
 ```ruby
 # config/initializers/js_admin.rb
@@ -104,8 +114,45 @@ JSAdmin.configure do |config|
 end
 ```
 
-For production apps, you can also mount JSAdmin inside the host application's
-admin authentication constraint when you need app-level authorization.
+To delegate authentication to the host application, provide a callback instead.
+JSAdmin controllers inherit from the host application's `ApplicationController`,
+and the callback runs in the controller context:
+
+```ruby
+# config/initializers/js_admin.rb
+JSAdmin.configure do |config|
+  config.authenticate_with do
+    authenticate_user!
+  end
+
+  config.authorize_with do
+    current_user&.admin?
+  end
+end
+```
+
+`authorize_with` is optional. When configured, returning `false` responds with
+`403 Forbidden`. Basic Auth and `authenticate_with` cannot be configured
+together. Partial Basic Auth credentials and `authorize_with` without
+`authenticate_with` also raise `JSAdmin::ConfigurationError`.
+
+For production apps, you can alternatively mount JSAdmin inside the host
+application's admin authentication constraint.
+
+## Internationalization
+
+JSAdmin follows the host application's `I18n.locale`.
+
+Supported locales:
+
+| Locale | Language |
+| --- | --- |
+| `en` | English |
+| `ko` | 한국어 |
+
+The translations cover the interface, CRUD notices, configuration errors, and
+generator messages. Host applications can override any key under the
+`js_admin` namespace.
 
 ## Field Mapping
 
@@ -117,6 +164,7 @@ JSAdmin maps database columns to inputs automatically:
 | `boolean` | checkbox |
 | `integer`, `bigint`, `float`, `decimal` | number input |
 | `date`, `datetime`, `time` | matching date/time input |
+| `select_options` configured column | select |
 | Rails enum | select |
 | `belongs_to` foreign key | select |
 | other columns | text input |

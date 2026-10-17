@@ -7,7 +7,10 @@ module JSAdmin
 
       def resource_for!(model_id)
         resources.find { |resource| resource.model_id == model_id } ||
-          raise(ActiveRecord::RecordNotFound, "Unknown JSAdmin resource: #{model_id}")
+          raise(
+            ActiveRecord::RecordNotFound,
+            I18n.t("js_admin.errors.unknown_resource", model_id: model_id)
+          )
       end
 
       def reset!

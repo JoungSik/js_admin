@@ -9,6 +9,8 @@ class ResourcesTest < ActionDispatch::IntegrationTest
       config.basic_auth_username = nil
       config.basic_auth_password = nil
       config.basic_auth_realm = "JSAdmin"
+      config.authenticate_with
+      config.authorize_with
     end
 
     @category = Category.create!(name: "Books")
@@ -34,6 +36,9 @@ class ResourcesTest < ActionDispatch::IntegrationTest
       config.basic_auth_username = nil
       config.basic_auth_password = nil
       config.basic_auth_realm = "JSAdmin"
+      config.authenticate_with
+      config.authorize_with
+      config.field_select_options = {}
     end
   end
 
@@ -57,6 +62,20 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     assert_select 'input[type="checkbox"][name="product[available]"]'
     assert_select 'select[name="product[status]"]'
     assert_select 'select[name="product[category_id]"]'
+  end
+
+  test "renders configured select options for a column" do
+    available_names = [ "Practical Rails" ]
+    JSAdmin.configure do |config|
+      config.select_options "Product", name: -> { available_names }
+    end
+    available_names += [ "Rails Testing" ]
+
+    get "/admin/product/#{@product.id}/edit"
+
+    assert_response :success
+    assert_select 'select[name="product[name]"] option[value="Rails Testing"]'
+    assert_select 'select[name="product[name]"] option[selected][value="Practical Rails"]'
   end
 
   test "creates a record through generic crud" do
@@ -208,5 +227,58 @@ class ResourcesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "aside a", text: /Product/
+  end
+
+  test "requires authentication through host callback when configured" do
+    JSAdmin.configure do |config|
+      config.authenticate_with do
+        head :unauthorized unless request.headers["X-JSAdmin-User"] == "admin"
+      end
+    end
+
+    get "/admin"
+    assert_response :unauthorized
+
+    get "/admin", headers: { "X-JSAdmin-User" => "admin" }
+    assert_response :success
+  end
+
+  test "returns forbidden when host authorization callback denies access" do
+    JSAdmin.configure do |config|
+      config.authenticate_with { request }
+      config.authorize_with { request.headers["X-JSAdmin-Role"] == "admin" }
+    end
+
+    get "/admin", headers: { "X-JSAdmin-Role" => "member" }
+    assert_response :forbidden
+
+    get "/admin", headers: { "X-JSAdmin-Role" => "admin" }
+    assert_response :success
+  end
+
+  test "renders js_admin interface using current locale" do
+    I18n.with_locale(:ko) do
+      get "/admin/product"
+    end
+
+    assert_response :success
+    assert_select "a", text: "홈"
+    assert_select "th", text: "작업"
+    assert_select "a", text: "보기"
+    assert_select "a", text: "편집"
+    assert_select "button", text: "삭제"
+    assert_select "nav[aria-label='페이지 탐색']"
+    assert_select "span", text: "참"
+  end
+
+  test "renders localized crud notice" do
+    I18n.with_locale(:ko) do
+      delete "/admin/product/#{@product.id}", headers: {
+        "Accept" => "text/vnd.turbo-stream.html"
+      }
+    end
+
+    assert_response :success
+    assert_includes response.body, "Product 레코드를 삭제했습니다."
   end
 end

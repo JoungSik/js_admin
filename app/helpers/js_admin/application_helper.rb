@@ -101,6 +101,8 @@ module JSAdmin
         tag.input(**js_admin_input_options(form, field, js_admin_text_input_classes(form, field)).merge(type: "datetime-local", value: js_admin_formatted_field_value(form, field, "%Y-%m-%dT%H:%M:%S")))
       when :time_field
         tag.input(**js_admin_input_options(form, field, js_admin_text_input_classes(form, field)).merge(type: "time", value: js_admin_formatted_field_value(form, field, "%H:%M:%S")))
+      when :configured_select
+        select_tag(js_admin_field_name(form, field), options_for_select(field.configured_select_values, js_admin_field_value(form, field)), js_admin_select_options(form, field))
       when :enum_select
         select_tag(js_admin_field_name(form, field), options_for_select(field.enum_values, js_admin_field_value(form, field)), js_admin_select_options(form, field))
       when :association_select
@@ -171,7 +173,11 @@ module JSAdmin
 
     def js_admin_table_value(field, record)
       value = field.formatted_value(record)
-      classes = value == "NULL" ? "text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-200"
+      classes = if field.value_for(record).nil?
+        "text-slate-400 dark:text-slate-500"
+      else
+        "text-slate-700 dark:text-slate-200"
+      end
 
       tag.span(truncate(value, length: 80), class: classes)
     end
@@ -189,7 +195,7 @@ module JSAdmin
     end
 
     def js_admin_sidebar_resource_label(resource)
-      resource.model_class.name.demodulize.underscore.humanize
+      resource.singular_label
     end
 
     def js_admin_sidebar_namespace_label(namespace)

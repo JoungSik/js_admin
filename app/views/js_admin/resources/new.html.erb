@@ -1,4 +1,4 @@
-<% content_for :title, "New #{@resource.singular_label}" %>
+<% content_for :title, t("js_admin.titles.new", resource: @resource.singular_label) %>
 
 <%= render layout: "layouts/js_admin/content_frame" do %>
   <%= render "new_content" %>

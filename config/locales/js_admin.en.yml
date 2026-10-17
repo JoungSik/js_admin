@@ -1,0 +1,65 @@
+en:
+  js_admin:
+    configuration:
+      errors:
+        incomplete_basic_auth: "Basic Auth username and password must both be configured."
+        multiple_authentication_strategies: "Basic Auth and authenticate_with cannot be configured at the same time."
+        authorization_without_authentication: "authorize_with requires authenticate_with."
+    generator:
+      options:
+        path: "Mount path for JSAdmin"
+      warnings:
+        importmap_missing: "config/importmap.rb was not found. Run bin/rails importmap:install, then rerun js_admin:install."
+    titles:
+      models: "JSAdmin Models"
+      new: "New %{resource}"
+      edit: "Edit %{record}"
+    navigation:
+      home: "Home"
+    models:
+      heading: "Models"
+      available:
+        one: "%{formatted_count} model available"
+        other: "%{formatted_count} models available"
+    resources:
+      notices:
+        created: "%{resource} was created."
+        updated: "%{resource} was updated."
+        deleted: "%{resource} was deleted."
+      records:
+        one: "%{formatted_count} record"
+        other: "%{formatted_count} records"
+      headings:
+        new: "New %{resource}"
+        edit: "Edit %{record}"
+      actions:
+        create: "Create %{resource}"
+        update: "Update %{resource}"
+        new: "New %{resource}"
+        view: "View"
+        edit: "Edit"
+        delete: "Delete"
+        cancel: "Cancel"
+      table:
+        actions: "Actions"
+        no_records: "No records"
+      delete_confirmation: "Delete this record?"
+      pagination:
+        label: "Pagination"
+        first: "First"
+        previous: "Previous"
+        next: "Next"
+        last: "Last"
+        status: "Page %{page} of %{total_pages}"
+    theme:
+      label: "Theme"
+      toggle: "Toggle"
+      toggle_aria_label: "Toggle dark mode"
+    values:
+      null: "NULL"
+      "true": "true"
+      "false": "false"
+    resource:
+      fallback_display_name: "%{resource} #%{id}"
+    errors:
+      unknown_resource: "Unknown JSAdmin resource: %{model_id}"
