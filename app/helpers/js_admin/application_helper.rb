@@ -101,6 +101,8 @@ module JSAdmin
         tag.input(**js_admin_input_options(form, field, js_admin_text_input_classes(form, field)).merge(type: "datetime-local", value: js_admin_formatted_field_value(form, field, "%Y-%m-%dT%H:%M:%S")))
       when :time_field
         tag.input(**js_admin_input_options(form, field, js_admin_text_input_classes(form, field)).merge(type: "time", value: js_admin_formatted_field_value(form, field, "%H:%M:%S")))
+      when :configured_select
+        select_tag(js_admin_field_name(form, field), options_for_select(field.configured_select_values, js_admin_field_value(form, field)), js_admin_select_options(form, field))
       when :enum_select
         select_tag(js_admin_field_name(form, field), options_for_select(field.enum_values, js_admin_field_value(form, field)), js_admin_select_options(form, field))
       when :association_select

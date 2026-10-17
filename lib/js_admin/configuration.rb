@@ -5,6 +5,7 @@ module JSAdmin
                   :records_per_page,
                   :association_limit,
                   :display_name_methods,
+                  :field_select_options,
                   :basic_auth_username,
                   :basic_auth_password,
                   :basic_auth_realm
@@ -17,6 +18,7 @@ module JSAdmin
       @records_per_page = 10
       @association_limit = 100
       @display_name_methods = %i[name title email username id]
+      @field_select_options = {}
       @basic_auth_username = nil
       @basic_auth_password = nil
       @basic_auth_realm = "JSAdmin"
@@ -30,6 +32,15 @@ module JSAdmin
 
     def exclude_models(*models)
       excluded_models.concat(normalize_model_names(models))
+    end
+
+    def select_options(model, **options_by_field)
+      model_options = field_select_options[normalize_model_names([ model ]).first] ||= {}
+      model_options.merge!(options_by_field.transform_keys(&:to_s))
+    end
+
+    def select_options_for(model, field_name)
+      field_select_options.dig(normalize_model_names([ model ]).first, field_name.to_s)
     end
 
     def basic_auth_enabled?
