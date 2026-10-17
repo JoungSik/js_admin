@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 - 2026-10-18
+
 - Add host application authentication and authorization callbacks as an alternative to Basic Auth.
 - Reject conflicting or incomplete authentication configuration with localized errors.
 - Add English and Korean I18n translations for the JSAdmin interface.
