@@ -38,6 +38,7 @@ class ResourcesTest < ActionDispatch::IntegrationTest
       config.basic_auth_realm = "JSAdmin"
       config.authenticate_with
       config.authorize_with
+      config.field_select_options = {}
     end
   end
 
@@ -61,6 +62,20 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     assert_select 'input[type="checkbox"][name="product[available]"]'
     assert_select 'select[name="product[status]"]'
     assert_select 'select[name="product[category_id]"]'
+  end
+
+  test "renders configured select options for a column" do
+    available_names = [ "Practical Rails" ]
+    JSAdmin.configure do |config|
+      config.select_options "Product", name: -> { available_names }
+    end
+    available_names += [ "Rails Testing" ]
+
+    get "/admin/product/#{@product.id}/edit"
+
+    assert_response :success
+    assert_select 'select[name="product[name]"] option[value="Rails Testing"]'
+    assert_select 'select[name="product[name]"] option[selected][value="Practical Rails"]'
   end
 
   test "creates a record through generic crud" do

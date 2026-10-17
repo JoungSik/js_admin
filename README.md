@@ -74,6 +74,7 @@ Available configuration options:
 | `records_per_page` | `10` | Number of records shown per resource index page. |
 | `association_limit` | `100` | Maximum number of associated records loaded into a `belongs_to` select. |
 | `display_name_methods` | `%i[name title email username id]` | Methods tried in order when displaying records in tables and select labels. |
+| `field_select_options` | `{}` | Select choices by model and column. Register them with `select_options`. |
 | `basic_auth_username` | `nil` | HTTP Basic Auth username. Auth is disabled unless username and password are both present. |
 | `basic_auth_password` | `nil` | HTTP Basic Auth password. |
 | `basic_auth_realm` | `"JSAdmin"` | HTTP Basic Auth realm. |
@@ -88,8 +89,13 @@ JSAdmin.configure do |config|
   config.include_models User, Post
   config.exclude_models AuditLog
   config.records_per_page = 10
+  config.select_options "Post", category: -> { Category.pluck(:name) }
 end
 ```
+
+`select_options` renders the column as a select. Pass an array or a callable;
+callables are evaluated each time the form renders. Choices can be values or
+`[label, value]` pairs.
 
 ## Authentication
 
@@ -158,6 +164,7 @@ JSAdmin maps database columns to inputs automatically:
 | `boolean` | checkbox |
 | `integer`, `bigint`, `float`, `decimal` | number input |
 | `date`, `datetime`, `time` | matching date/time input |
+| `select_options` configured column | select |
 | Rails enum | select |
 | `belongs_to` foreign key | select |
 | other columns | text input |

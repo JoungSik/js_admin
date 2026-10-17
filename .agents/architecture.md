@@ -66,6 +66,7 @@ Ruby 상수는 `JSAdmin`을 사용합니다. `lib/js_admin/engine.rb`의 inflect
 - `boolean`: checkbox
 - `integer`, `bigint`, `float`, `decimal`: number input
 - `date`, `datetime`, `time`: matching date/time input
+- `select_options` 설정 column: select (callable은 form 렌더링마다 평가)
 - Rails enum: select
 - `belongs_to` foreign key: select
 - 그 외: text input

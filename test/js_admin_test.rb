@@ -95,6 +95,16 @@ class JSAdminTest < ActiveSupport::TestCase
     assert_operator JSAdmin::ApplicationController, :<, ::ApplicationController
   end
 
+  test "configuration stores select options by model name and field name" do
+    configuration = JSAdmin::Configuration.new
+    status_options = -> { %w[draft published] }
+
+    configuration.select_options Product, name: status_options
+
+    assert_same status_options, configuration.select_options_for("Product", :name)
+    assert_nil configuration.select_options_for(Product, :description)
+  end
+
   test "javascript registers controllers with the host stimulus application when present" do
     javascript = JSAdmin::Engine.root.join("app/assets/javascripts/js_admin/application.js").read
     theme_controller = JSAdmin::Engine.root.join("app/assets/javascripts/js_admin/controllers/theme_controller.js").read

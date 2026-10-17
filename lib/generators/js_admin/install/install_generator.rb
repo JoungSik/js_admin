@@ -36,6 +36,9 @@ module JSAdmin
             # Methods tried in order when displaying records in labels and associations.
             # config.display_name_methods = %i[name title email username id]
 
+            # Render a column as a select. Callables are evaluated on every form render.
+            # config.select_options "Post", category: -> { Category.pluck(:name) }
+
             # Basic Auth is disabled unless both username and password are present.
             # config.basic_auth_username = ENV["JS_ADMIN_BASIC_AUTH_USERNAME"]
             # config.basic_auth_password = ENV["JS_ADMIN_BASIC_AUTH_PASSWORD"]
