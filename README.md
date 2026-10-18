@@ -193,11 +193,12 @@ JSAdmin.configure do |config|
     list: %i[id name email],
     show: %i[id name email created_at],
     form: %i[name email],
+    search: %i[name email],
     hidden: %i[api_token]
 end
 ```
 
-- `list`, `show`, and `form` replace the default columns for that screen and
+- `list`, `show`, `form`, and `search` replace the default columns for that screen and
   keep the configured order. Explicitly configured columns are shown even when
   they match `filter_parameters`.
 - `hidden` removes columns from every screen and takes precedence over the
@@ -208,8 +209,23 @@ end
 - Set `config.hide_filtered_columns = false` to stop hiding columns that match
   `filter_parameters`.
 
-Unknown column names and non-editable columns in `form` raise
-`JSAdmin::ConfigurationError` when the model's screen is first rendered.
+Unknown column names, non-editable columns in `form`, and non-string columns
+in `search` raise `JSAdmin::ConfigurationError` when the model's screen is
+first rendered.
+
+## Search and Filters
+
+The index page renders a search box and filter selects when the model has
+searchable or filterable columns. Search and filter conditions are kept in
+pagination links and after deleting a record from the list.
+
+| Control | Columns | Behavior |
+| --- | --- | --- |
+| Search (`q`) | `string` and `text` columns shown on the detail page, or `search` columns | Case-insensitive partial match across columns. `%` and `_` are matched literally. |
+| Filters (`filters[column]`) | `belongs_to`, enum, and boolean columns shown on the detail page | Exact match. Unknown values and columns are ignored. |
+
+Columns hidden by `hidden` or `filter_parameters` are not searched unless they
+are listed in `search`.
 
 ## Hotwire Scope
 

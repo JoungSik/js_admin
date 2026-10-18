@@ -220,6 +220,18 @@ module JSAdmin
       [ FLASH_BASE_CLASSES, FLASH_CLASSES.fetch(type.to_sym) ].join(" ")
     end
 
+    def js_admin_search_input_classes
+      TEXT_INPUT_CLASSES
+    end
+
+    def js_admin_filter_select_classes
+      SELECT_INPUT_CLASSES
+    end
+
+    def js_admin_list_params(page: @page)
+      { page: page, **@record_query.to_params }
+    end
+
     def js_admin_pagination_link_classes
       PAGINATION_LINK_CLASSES
     end

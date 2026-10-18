@@ -42,10 +42,18 @@ module JSAdmin
       field_selection.fields_for(:form)
     end
 
-    def records(page:)
+    def search_fields
+      field_selection.fields_for(:search)
+    end
+
+    def filter_fields
+      show_fields.select(&:filterable?)
+    end
+
+    def records(page:, scope: model_class.all)
       page_number = [ page.to_i, 1 ].max
-      model_class.all
-        .then { |scope| ordered_scope(scope) }
+      scope
+        .then { |records_scope| ordered_scope(records_scope) }
         .limit(records_per_page)
         .offset((page_number - 1) * records_per_page)
     end

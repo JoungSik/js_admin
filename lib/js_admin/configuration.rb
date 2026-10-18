@@ -47,8 +47,8 @@ module JSAdmin
       field_select_options.dig(normalize_model_names([ model ]).first, field_name.to_s)
     end
 
-    def fields(model, list: nil, show: nil, form: nil, hidden: nil)
-      configured_columns = { list: list, show: show, form: form, hidden: hidden }
+    def fields(model, list: nil, show: nil, form: nil, search: nil, hidden: nil)
+      configured_columns = { list: list, show: show, form: form, search: search, hidden: hidden }
         .compact
         .transform_values { |column_names| Array(column_names).map(&:to_s) }
       model_settings = field_settings[normalize_model_names([ model ]).first] ||= {}

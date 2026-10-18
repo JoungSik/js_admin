@@ -78,10 +78,23 @@ module JSAdmin
     end
 
     def load_records
-      @total_count = @resource.count
+      @record_query = RecordQuery.new(@resource, search_term: search_term_param, filter_values: filter_params)
+      records_scope = @record_query.scope
+      @total_count = records_scope.count
       @total_pages = @resource.total_pages(total_count: @total_count)
       @page = [ [ params.fetch(:page, 1).to_i, 1 ].max, @total_pages ].min
-      @records = @resource.records(page: @page)
+      @records = @resource.records(page: @page, scope: records_scope)
+    end
+
+    def search_term_param
+      params[:q] if params[:q].is_a?(String)
+    end
+
+    def filter_params
+      filters = params[:filters]
+      return {} unless filters.respond_to?(:permit)
+
+      filters.permit(*@resource.filter_fields.map(&:name)).to_h
     end
 
     def resource_params

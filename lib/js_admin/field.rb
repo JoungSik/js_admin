@@ -1,5 +1,7 @@
 module JSAdmin
   class Field
+    SEARCHABLE_TYPES = %i[string text].freeze
+
     attr_reader :resource, :column
 
     def initialize(resource, column)
@@ -62,6 +64,34 @@ module JSAdmin
         :time_field
       else
         :text_field
+      end
+    end
+
+    def searchable?
+      SEARCHABLE_TYPES.include?(type)
+    end
+
+    def filter_kind
+      return :association if belongs_to_association
+      return :enum if enum?
+
+      :boolean if type == :boolean
+    end
+
+    def filterable?
+      !filter_kind.nil?
+    end
+
+    def filter_options
+      case filter_kind
+      when :association
+        association_options
+      when :enum
+        enum_values
+      when :boolean
+        RecordQuery::BOOLEAN_FILTER_VALUES.map { |value| [ I18n.t("js_admin.values.#{value}"), value ] }
+      else
+        []
       end
     end
 

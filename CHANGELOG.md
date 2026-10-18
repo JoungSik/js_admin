@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add index search across string and text columns, configurable with `fields search:`.
+- Add index filters for `belongs_to`, enum, and boolean columns, kept across pagination and deletes.
+
 - Add `fields` configuration to choose visible columns for the index, detail, and form screens, and to hide columns by model.
 - Hide columns matching the host application's `filter_parameters` by default, with `hide_filtered_columns` to disable it.
 
