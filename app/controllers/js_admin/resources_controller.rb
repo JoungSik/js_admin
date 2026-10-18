@@ -87,7 +87,7 @@ module JSAdmin
     def resource_params
       params
         .fetch(@resource.param_key, ActionController::Parameters.new)
-        .permit(*@resource.editable_fields.map(&:name))
+        .permit(*@resource.form_fields.map(&:name))
     end
   end
 end

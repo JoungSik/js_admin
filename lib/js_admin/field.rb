@@ -27,6 +27,13 @@ module JSAdmin
       %w[created_at updated_at].include?(name)
     end
 
+    def filtered?
+      parameter_filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
+      probe_value = +"js_admin"
+
+      parameter_filter.filter(name => probe_value)[name] != probe_value
+    end
+
     def editable?
       !primary_key? &&
         !timestamp? &&

@@ -39,6 +39,10 @@ module JSAdmin
             # Render a column as a select. Callables are evaluated on every form render.
             # config.select_options "Post", category: -> { Category.pluck(:name) }
 
+            # Choose visible columns per screen. Columns matching filter_parameters are hidden unless listed.
+            # config.fields "User", list: %i[id name email], form: %i[name email], hidden: %i[api_token]
+            # config.hide_filtered_columns = true
+
             # Basic Auth is disabled unless both username and password are present.
             # config.basic_auth_username = ENV["JS_ADMIN_BASIC_AUTH_USERNAME"]
             # config.basic_auth_password = ENV["JS_ADMIN_BASIC_AUTH_PASSWORD"]

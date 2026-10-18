@@ -26,6 +26,7 @@ class ResourcesTest < ActionDispatch::IntegrationTest
   end
 
   teardown do
+    User.delete_all
     Comment.delete_all
     Product.delete_all
     Category.delete_all
@@ -40,6 +41,8 @@ class ResourcesTest < ActionDispatch::IntegrationTest
       config.authenticate_with
       config.authorize_with
       config.field_select_options = {}
+      config.field_settings = {}
+      config.hide_filtered_columns = true
     end
   end
 
@@ -211,6 +214,50 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     assert_select 'input[type="number"][name="comment[commentable_id]"]'
   end
 
+  test "does not render filtered columns on user screens" do
+    include_user_model
+    user = create_user
+
+    [ "/admin/user", "/admin/user/#{user.id}", "/admin/user/#{user.id}/edit" ].each do |path|
+      get path
+
+      assert_response :success
+      assert_not_includes response.body, "secret-token", path
+      assert_not_includes response.body, "digest-value", path
+      assert_not_includes response.body, "admin@example.com", path
+    end
+    assert_select 'input[name="user[name]"]'
+    assert_select 'input[name="user[api_token]"]', 0
+  end
+
+  test "ignores filtered columns submitted through the form" do
+    include_user_model
+    user = create_user
+
+    patch "/admin/user/#{user.id}", params: {
+      user: { name: "Renamed", api_token: "changed-token" }
+    }
+
+    assert_redirected_to "/admin/user/#{user.id}"
+    user.reload
+    assert_equal "Renamed", user.name
+    assert_equal "secret-token", user.api_token
+  end
+
+  test "renders explicitly configured filtered columns" do
+    include_user_model
+    create_user
+    JSAdmin.configure do |config|
+      config.fields "User", list: %i[id name email]
+    end
+
+    get "/admin/user"
+
+    assert_response :success
+    assert_includes response.body, "admin@example.com"
+    assert_not_includes response.body, "secret-token"
+  end
+
   test "renders view edit and delete row actions" do
     get "/admin/product"
 
@@ -340,5 +387,22 @@ class ResourcesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Category 레코드를 삭제하지 못했습니다. 다른 레코드에서 참조하고 있습니다."
+  end
+
+  private
+
+  def include_user_model
+    JSAdmin.configure do |config|
+      config.included_models = [ "Category", "Product", "User" ]
+    end
+  end
+
+  def create_user
+    User.create!(
+      name: "Admin",
+      email: "admin@example.com",
+      password_digest: "digest-value",
+      api_token: "secret-token"
+    )
   end
 end

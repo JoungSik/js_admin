@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `fields` configuration to choose visible columns for the index, detail, and form screens, and to hide columns by model.
+- Hide columns matching the host application's `filter_parameters` by default, with `hide_filtered_columns` to disable it.
+
 - Show an alert instead of a success notice when a record deletion is blocked by dependent records or foreign key constraints.
 - Render polymorphic `belongs_to` columns as plain inputs instead of failing to load the form.
 

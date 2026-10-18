@@ -5,6 +5,8 @@ en:
         incomplete_basic_auth: "Basic Auth username and password must both be configured."
         multiple_authentication_strategies: "Basic Auth and authenticate_with cannot be configured at the same time."
         authorization_without_authentication: "authorize_with requires authenticate_with."
+        unknown_field: "%{model} has no column named %{field}."
+        non_editable_form_field: "%{model}#%{field} is not editable and cannot be used in the form."
     generator:
       options:
         path: "Mount path for JSAdmin"
