@@ -38,15 +38,18 @@ module JSAdmin
     end
 
     def destroy
-      @record.destroy
-      message = t("js_admin.resources.notices.deleted", resource: @resource.singular_label)
+      flash_type, message = if destroy_record
+        [ :notice, t("js_admin.resources.notices.deleted", resource: @resource.singular_label) ]
+      else
+        [ :alert, destroy_failure_message ]
+      end
 
       respond_to do |format|
         format.turbo_stream do
-          flash.now[:notice] = message
+          flash.now[flash_type] = message
           load_records
         end
-        format.html { redirect_to resources_path(@resource.model_id), notice: message }
+        format.html { redirect_to resources_path(@resource.model_id), flash_type => message }
       end
     end
 
@@ -58,6 +61,20 @@ module JSAdmin
 
     def set_record
       @record = @resource.find(params[:id])
+    end
+
+    def destroy_record
+      @record.destroy
+    rescue ActiveRecord::InvalidForeignKey
+      @record.errors.add(:base, t("js_admin.resources.alerts.referenced"))
+      false
+    end
+
+    def destroy_failure_message
+      [
+        t("js_admin.resources.alerts.delete_failed", resource: @resource.singular_label),
+        *@record.errors.full_messages
+      ].join(" ")
     end
 
     def load_records
