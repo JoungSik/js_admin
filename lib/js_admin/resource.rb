@@ -53,7 +53,6 @@ module JSAdmin
     def records(page:, scope: model_class.all)
       page_number = [ page.to_i, 1 ].max
       scope
-        .then { |records_scope| ordered_scope(records_scope) }
         .limit(records_per_page)
         .offset((page_number - 1) * records_per_page)
     end
@@ -100,13 +99,6 @@ module JSAdmin
 
     def field_selection
       @field_selection ||= FieldSelection.new(self)
-    end
-
-    def ordered_scope(scope)
-      primary_key = model_class.primary_key
-      return scope unless primary_key && model_class.column_names.include?(primary_key)
-
-      scope.order(primary_key => :desc)
     end
 
     def records_per_page

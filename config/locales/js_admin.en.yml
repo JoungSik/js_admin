@@ -8,6 +8,7 @@ en:
         unknown_field: "%{model} has no column named %{field}."
         non_editable_form_field: "%{model}#%{field} is not editable and cannot be used in the form."
         non_searchable_field: "%{model}#%{field} is not a string or text column and cannot be searched."
+        invalid_sort_direction: "Sort direction must be asc or desc: %{direction}"
     generator:
       options:
         path: "Mount path for JSAdmin"
@@ -55,6 +56,9 @@ en:
         placeholder: "Search"
         submit: "Search"
         clear: "Clear"
+      sort:
+        ascending: "sorted ascending"
+        descending: "sorted descending"
       filters:
         any: "All %{field}"
       pagination:

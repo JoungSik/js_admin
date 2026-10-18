@@ -78,7 +78,13 @@ module JSAdmin
     end
 
     def load_records
-      @record_query = RecordQuery.new(@resource, search_term: search_term_param, filter_values: filter_params)
+      @record_query = RecordQuery.new(
+        @resource,
+        search_term: string_param(:q),
+        filter_values: filter_params,
+        sort_column: string_param(:sort),
+        sort_direction: string_param(:direction)
+      )
       records_scope = @record_query.scope
       @total_count = records_scope.count
       @total_pages = @resource.total_pages(total_count: @total_count)
@@ -86,8 +92,8 @@ module JSAdmin
       @records = @resource.records(page: @page, scope: records_scope)
     end
 
-    def search_term_param
-      params[:q] if params[:q].is_a?(String)
+    def string_param(key)
+      params[key] if params[key].is_a?(String)
     end
 
     def filter_params

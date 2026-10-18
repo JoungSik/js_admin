@@ -53,6 +53,7 @@ Ruby 상수는 `JSAdmin`을 사용합니다. `lib/js_admin/engine.rb`의 inflect
 - 화면별(목록·상세·폼) 노출 컬럼 선택은 `JSAdmin::FieldSelection`이 담당합니다. 우선순위는 `hidden` > `fields` 명시 설정 > host app `filter_parameters` > 기본 규칙입니다.
 - strong parameters는 `Resource#form_fields` 기준으로 허용합니다. 폼에 노출되지 않은 컬럼은 저장되지 않아야 합니다.
 - 목록 검색·필터는 `JSAdmin::RecordQuery`가 담당합니다. 검색 대상은 `Resource#search_fields`, 필터 대상은 상세 화면 컬럼 중 `belongs_to`/enum/boolean입니다. 사용자 입력은 허용된 컬럼과 값만 scope에 반영하고, 목록 링크와 삭제 요청에 `js_admin_list_params`로 조건을 유지합니다.
+- 목록 정렬도 `JSAdmin::RecordQuery`가 담당합니다. `sort` 파라미터는 `Resource#list_fields` 컬럼만 허용하고, 우선순위는 요청 파라미터 > `default_sort` > primary key 내림차순입니다.
 - controller는 모델별 controller를 만들지 않고 `JSAdmin::ResourcesController` 하나로 generic CRUD를 처리합니다.
 - `/admin` root는 비어 있는 home입니다. 모델 탐색은 layout sidebar에서 처리합니다.
 - 데스크톱 sidebar는 content와 독립적으로 고정되어야 하며, theme toggle은 sidebar 하단에 둡니다.

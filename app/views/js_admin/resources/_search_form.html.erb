@@ -1,4 +1,8 @@
 <%= form_with url: resources_path(@resource.model_id), method: :get, class: "mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center", data: { turbo_action: "advance" } do %>
+  <% @record_query.sort_params.each do |name, value| %>
+    <%= hidden_field_tag name, value, id: nil %>
+  <% end %>
+
   <% if @resource.search_fields.any? %>
     <div class="sm:w-72">
       <%= label_tag :q, t("js_admin.resources.search.label"), class: "sr-only" %>
@@ -17,7 +21,7 @@
     <%= submit_tag t("js_admin.resources.search.submit"), name: nil, class: "inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" %>
 
     <% if @record_query.active? %>
-      <%= link_to t("js_admin.resources.search.clear"), resources_path(@resource.model_id), class: "text-sm font-medium text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-slate-100" %>
+      <%= link_to t("js_admin.resources.search.clear"), resources_path(@resource.model_id, **@record_query.sort_params), class: "text-sm font-medium text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-slate-100" %>
     <% end %>
   </div>
 <% end %>

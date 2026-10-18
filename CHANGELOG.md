@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add sortable list column headers and `default_sort` per model.
+
 - Add index search across string and text columns, configurable with `fields search:`.
 - Add index filters for `belongs_to`, enum, and boolean columns, kept across pagination and deletes.
 

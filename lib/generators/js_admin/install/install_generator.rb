@@ -41,6 +41,7 @@ module JSAdmin
 
             # Choose visible columns per screen. Columns matching filter_parameters are hidden unless listed.
             # config.fields "User", list: %i[id name email], form: %i[name email], search: %i[name email], hidden: %i[api_token]
+            # config.default_sort "Post", :published_at, :desc
             # config.hide_filtered_columns = true
 
             # Basic Auth is disabled unless both username and password are present.
