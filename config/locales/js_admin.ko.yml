@@ -5,6 +5,8 @@ ko:
         incomplete_basic_auth: "Basic Auth username과 password를 모두 설정해야 합니다."
         multiple_authentication_strategies: "Basic Auth와 authenticate_with는 동시에 설정할 수 없습니다."
         authorization_without_authentication: "authorize_with를 사용하려면 authenticate_with가 필요합니다."
+        unknown_field: "%{model} 모델에 %{field} 컬럼이 없습니다."
+        non_editable_form_field: "%{model} 모델의 %{field} 컬럼은 수정할 수 없어 폼에 사용할 수 없습니다."
     generator:
       options:
         path: "JSAdmin mount 경로"

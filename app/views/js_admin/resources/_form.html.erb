@@ -13,7 +13,7 @@
 
   <div class="rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
     <div class="divide-y divide-slate-200 dark:divide-slate-800">
-      <% resource.editable_fields.each do |field| %>
+      <% resource.form_fields.each do |field| %>
         <% field_errors = js_admin_field_errors(record, field) %>
 
         <div class="grid gap-3 px-5 py-5 sm:grid-cols-12 sm:gap-6 sm:px-6">

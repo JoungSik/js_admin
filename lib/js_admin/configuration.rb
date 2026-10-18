@@ -6,6 +6,8 @@ module JSAdmin
                   :association_limit,
                   :display_name_methods,
                   :field_select_options,
+                  :field_settings,
+                  :hide_filtered_columns,
                   :basic_auth_username,
                   :basic_auth_password,
                   :basic_auth_realm
@@ -19,6 +21,8 @@ module JSAdmin
       @association_limit = 100
       @display_name_methods = %i[name title email username id]
       @field_select_options = {}
+      @field_settings = {}
+      @hide_filtered_columns = true
       @basic_auth_username = nil
       @basic_auth_password = nil
       @basic_auth_realm = "JSAdmin"
@@ -41,6 +45,18 @@ module JSAdmin
 
     def select_options_for(model, field_name)
       field_select_options.dig(normalize_model_names([ model ]).first, field_name.to_s)
+    end
+
+    def fields(model, list: nil, show: nil, form: nil, hidden: nil)
+      configured_columns = { list: list, show: show, form: form, hidden: hidden }
+        .compact
+        .transform_values { |column_names| Array(column_names).map(&:to_s) }
+      model_settings = field_settings[normalize_model_names([ model ]).first] ||= {}
+      model_settings.merge!(configured_columns)
+    end
+
+    def field_settings_for(model)
+      field_settings.fetch(normalize_model_names([ model ]).first, {})
     end
 
     def basic_auth_enabled?

@@ -16,7 +16,7 @@
 
 <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
   <dl class="divide-y divide-slate-200 dark:divide-slate-800">
-    <% @resource.fields.each do |field| %>
+    <% @resource.show_fields.each do |field| %>
       <div class="grid gap-3 px-5 py-5 sm:grid-cols-12 sm:gap-6 sm:px-6">
         <dt class="text-sm font-medium text-slate-600 dark:text-slate-300 sm:col-span-4"><%= field.human_name %></dt>
         <dd class="text-sm text-slate-950 dark:text-slate-100 sm:col-span-8"><%= js_admin_table_value(field, @record) %></dd>

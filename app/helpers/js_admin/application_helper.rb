@@ -125,7 +125,7 @@ module JSAdmin
     end
 
     def js_admin_form_errors(record, resource)
-      editable_attributes = resource.editable_fields.map { |field| field.name.to_sym }
+      editable_attributes = resource.form_fields.map { |field| field.name.to_sym }
 
       record.errors.filter_map do |error|
         next if editable_attributes.include?(error.attribute.to_sym)

@@ -75,6 +75,8 @@ Available configuration options:
 | `association_limit` | `100` | Maximum number of associated records loaded into a `belongs_to` select. |
 | `display_name_methods` | `%i[name title email username id]` | Methods tried in order when displaying records in tables and select labels. |
 | `field_select_options` | `{}` | Select choices by model and column. Register them with `select_options`. |
+| `field_settings` | `{}` | Visible columns by model and screen. Register them with `fields`. |
+| `hide_filtered_columns` | `true` | Hide columns matching the host application's `filter_parameters` unless they are configured explicitly. |
 | `basic_auth_username` | `nil` | HTTP Basic Auth username. Auth is disabled unless username and password are both present. |
 | `basic_auth_password` | `nil` | HTTP Basic Auth password. |
 | `basic_auth_realm` | `"JSAdmin"` | HTTP Basic Auth realm. |
@@ -171,6 +173,43 @@ JSAdmin maps database columns to inputs automatically:
 
 Primary keys, timestamps, STI inheritance columns, readonly attributes, and
 generated columns are not editable.
+
+## Field Visibility
+
+By default, the index page shows the primary key and the first six other
+non-timestamp columns, the detail page shows every column, and the form shows
+every editable column.
+
+Columns matching the host application's `filter_parameters` are hidden from
+every screen and cannot be submitted through the form. With the Rails default
+filters, this hides columns such as `password_digest`, `api_token`, and `email`.
+
+Configure visible columns per model and screen with `fields`:
+
+```ruby
+# config/initializers/js_admin.rb
+JSAdmin.configure do |config|
+  config.fields "User",
+    list: %i[id name email],
+    show: %i[id name email created_at],
+    form: %i[name email],
+    hidden: %i[api_token]
+end
+```
+
+- `list`, `show`, and `form` replace the default columns for that screen and
+  keep the configured order. Explicitly configured columns are shown even when
+  they match `filter_parameters`.
+- `hidden` removes columns from every screen and takes precedence over the
+  other options.
+- Only columns shown in the form are permitted as parameters.
+- Every option is optional. Calling `fields` again for the same model merges the
+  options.
+- Set `config.hide_filtered_columns = false` to stop hiding columns that match
+  `filter_parameters`.
+
+Unknown column names and non-editable columns in `form` raise
+`JSAdmin::ConfigurationError` when the model's screen is first rendered.
 
 ## Hotwire Scope
 

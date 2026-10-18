@@ -31,11 +31,15 @@ module JSAdmin
     end
 
     def list_fields
-      visible_fields = fields.reject(&:timestamp?)
-      id_field = visible_fields.find(&:primary_key?)
-      selected_fields = visible_fields.reject(&:primary_key?).first(6)
+      field_selection.fields_for(:list)
+    end
 
-      [ id_field, *selected_fields ].compact
+    def show_fields
+      field_selection.fields_for(:show)
+    end
+
+    def form_fields
+      field_selection.fields_for(:form)
     end
 
     def records(page:)
@@ -85,6 +89,10 @@ module JSAdmin
     end
 
     private
+
+    def field_selection
+      @field_selection ||= FieldSelection.new(self)
+    end
 
     def ordered_scope(scope)
       primary_key = model_class.primary_key
