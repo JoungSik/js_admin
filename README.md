@@ -227,6 +227,24 @@ pagination links and after deleting a record from the list.
 Columns hidden by `hidden` or `filter_parameters` are not searched unless they
 are listed in `search`.
 
+## Sorting
+
+Click a list column header to sort by that column; click it again to reverse
+the direction. Sorting uses `sort` and `direction` query parameters, is limited
+to columns shown on the list page, and is kept across pagination, search, and
+deletes. Records with equal values are ordered by primary key descending.
+
+Set a default sort per model:
+
+```ruby
+JSAdmin.configure do |config|
+  config.default_sort "Post", :published_at, :desc
+end
+```
+
+The direction defaults to `:asc`. Without a default sort, records are ordered by
+primary key descending.
+
 ## Hotwire Scope
 
 JSAdmin depends on `importmap-rails`, `turbo-rails`, and `stimulus-rails` so it

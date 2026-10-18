@@ -66,6 +66,9 @@ module JSAdmin
       alert: "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200"
     }.freeze
 
+    SORT_ARIA_VALUES = { "asc" => "ascending", "desc" => "descending" }.freeze
+    SORT_INDICATORS = { "asc" => "↑", "desc" => "↓" }.freeze
+
     PAGINATION_LINK_CLASSES = [
       "inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-slate-300 bg-white px-3 text-sm font-medium",
       "text-slate-700 shadow-sm hover:bg-slate-50",
@@ -230,6 +233,24 @@ module JSAdmin
 
     def js_admin_list_params(page: @page)
       { page: page, **@record_query.to_params }
+    end
+
+    def js_admin_sort_link_params(field)
+      next_direction = js_admin_sort_direction(field) == "asc" ? "desc" : "asc"
+
+      { page: 1, **@record_query.condition_params, sort: field.name, direction: next_direction }
+    end
+
+    def js_admin_sort_direction(field)
+      @record_query.sort_direction if @record_query.sort_column == field.name
+    end
+
+    def js_admin_aria_sort(field)
+      SORT_ARIA_VALUES[js_admin_sort_direction(field)]
+    end
+
+    def js_admin_sort_indicator(field)
+      SORT_INDICATORS[js_admin_sort_direction(field)]
     end
 
     def js_admin_pagination_link_classes

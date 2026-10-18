@@ -7,6 +7,7 @@ module JSAdmin
                   :display_name_methods,
                   :field_select_options,
                   :field_settings,
+                  :default_sorts,
                   :hide_filtered_columns,
                   :basic_auth_username,
                   :basic_auth_password,
@@ -22,6 +23,7 @@ module JSAdmin
       @display_name_methods = %i[name title email username id]
       @field_select_options = {}
       @field_settings = {}
+      @default_sorts = {}
       @hide_filtered_columns = true
       @basic_auth_username = nil
       @basic_auth_password = nil
@@ -57,6 +59,18 @@ module JSAdmin
 
     def field_settings_for(model)
       field_settings.fetch(normalize_model_names([ model ]).first, {})
+    end
+
+    def default_sort(model, column_name, direction = :asc)
+      unless RecordQuery::SORT_DIRECTIONS.include?(direction.to_s)
+        raise ConfigurationError, I18n.t("js_admin.configuration.errors.invalid_sort_direction", direction: direction)
+      end
+
+      default_sorts[normalize_model_names([ model ]).first] = [ column_name.to_s, direction.to_s ]
+    end
+
+    def default_sort_for(model)
+      default_sorts[normalize_model_names([ model ]).first]
     end
 
     def basic_auth_enabled?

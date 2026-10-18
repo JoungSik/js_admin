@@ -8,6 +8,7 @@ ko:
         unknown_field: "%{model} 모델에 %{field} 컬럼이 없습니다."
         non_editable_form_field: "%{model} 모델의 %{field} 컬럼은 수정할 수 없어 폼에 사용할 수 없습니다."
         non_searchable_field: "%{model} 모델의 %{field} 컬럼은 문자열·텍스트 컬럼이 아니어서 검색에 사용할 수 없습니다."
+        invalid_sort_direction: "정렬 방향은 asc 또는 desc만 사용할 수 있습니다: %{direction}"
     generator:
       options:
         path: "JSAdmin mount 경로"
@@ -55,6 +56,9 @@ ko:
         placeholder: "검색어 입력"
         submit: "검색"
         clear: "초기화"
+      sort:
+        ascending: "오름차순 정렬됨"
+        descending: "내림차순 정렬됨"
       filters:
         any: "%{field} 전체"
       pagination:
