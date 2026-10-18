@@ -22,6 +22,9 @@ en:
         one: "%{formatted_count} model available"
         other: "%{formatted_count} models available"
     resources:
+      alerts:
+        delete_failed: "%{resource} could not be deleted."
+        referenced: "It is referenced by other records."
       notices:
         created: "%{resource} was created."
         updated: "%{resource} was updated."

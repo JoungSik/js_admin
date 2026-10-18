@@ -26,6 +26,7 @@ class ResourcesTest < ActionDispatch::IntegrationTest
   end
 
   teardown do
+    Comment.delete_all
     Product.delete_all
     Category.delete_all
 
@@ -162,6 +163,54 @@ class ResourcesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Product was deleted."
   end
 
+  test "keeps a record and alerts when dependent records restrict deletion" do
+    @product.comments.create!(body: "Great book")
+
+    assert_no_difference "Product.count" do
+      delete "/admin/product/#{@product.id}"
+    end
+
+    assert_redirected_to "/admin/product"
+    assert_nil flash[:notice]
+    assert_equal "Product could not be deleted. Cannot delete record because dependent comments exist", flash[:alert]
+  end
+
+  test "renders delete failure alert through turbo stream updates" do
+    @product.comments.create!(body: "Great book")
+
+    assert_no_difference "Product.count" do
+      delete "/admin/product/#{@product.id}", headers: {
+        "Accept" => "text/vnd.turbo-stream.html"
+      }
+    end
+
+    assert_response :success
+    assert_includes response.body, 'target="js_admin_flash"'
+    assert_includes response.body, "Product could not be deleted."
+    assert_not_includes response.body, "Product was deleted."
+  end
+
+  test "keeps a record and alerts when a foreign key constraint blocks deletion" do
+    assert_no_difference "Category.count" do
+      delete "/admin/category/#{@category.id}"
+    end
+
+    assert_redirected_to "/admin/category"
+    assert_equal "Category could not be deleted. It is referenced by other records.", flash[:alert]
+  end
+
+  test "renders polymorphic belongs_to columns as plain inputs" do
+    JSAdmin.configure do |config|
+      config.included_models = [ "Category", "Product", "Comment" ]
+    end
+
+    get "/admin/comment/new"
+
+    assert_response :success
+    assert_select 'input[type="text"][name="comment[commentable_type]"]'
+    assert_select 'input[type="number"][name="comment[commentable_id]"]'
+  end
+
   test "renders view edit and delete row actions" do
     get "/admin/product"
 
@@ -280,5 +329,16 @@ class ResourcesTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Product 레코드를 삭제했습니다."
+  end
+
+  test "renders localized delete failure alert" do
+    I18n.with_locale(:ko) do
+      delete "/admin/category/#{@category.id}", headers: {
+        "Accept" => "text/vnd.turbo-stream.html"
+      }
+    end
+
+    assert_response :success
+    assert_includes response.body, "Category 레코드를 삭제하지 못했습니다. 다른 레코드에서 참조하고 있습니다."
   end
 end

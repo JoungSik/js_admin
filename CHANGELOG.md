@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Show an alert instead of a success notice when a record deletion is blocked by dependent records or foreign key constraints.
+- Render polymorphic `belongs_to` columns as plain inputs instead of failing to load the form.
+
 ## 0.2.0 - 2026-10-18
 
 - Add host application authentication and authorization callbacks as an alternative to Basic Auth.
