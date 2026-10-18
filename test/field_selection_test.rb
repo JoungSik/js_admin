@@ -98,6 +98,23 @@ class FieldSelectionTest < ActiveSupport::TestCase
     assert_equal "User 모델의 id 컬럼은 수정할 수 없어 폼에 사용할 수 없습니다.", error.message
   end
 
+  test "searches visible string and text columns by default" do
+    assert_equal %w[name], field_names(JSAdmin::Resource.new(User).search_fields)
+    assert_equal %w[description name], field_names(JSAdmin::Resource.new(Product).search_fields)
+  end
+
+  test "raises a configuration error for non searchable columns" do
+    JSAdmin.configure do |config|
+      config.fields "Product", search: %i[price]
+    end
+
+    error = assert_raises(JSAdmin::ConfigurationError) do
+      JSAdmin::Resource.new(Product).search_fields
+    end
+
+    assert_equal "Product#price is not a string or text column and cannot be searched.", error.message
+  end
+
   private
 
   def field_names(fields)

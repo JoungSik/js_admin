@@ -37,6 +37,7 @@ module JSAdmin
       column_names.map do |column_name|
         field = find_field!(column_name)
         raise_configuration_error(:non_editable_form_field, column_name) if screen == :form && !field.editable?
+        raise_configuration_error(:non_searchable_field, column_name) if screen == :search && !field.searchable?
 
         field
       end
@@ -50,6 +51,8 @@ module JSAdmin
         default_visible(resource.fields)
       when :form
         default_visible(resource.editable_fields)
+      when :search
+        default_visible(resource.fields).select(&:searchable?)
       end
     end
 

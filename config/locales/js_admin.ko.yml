@@ -7,6 +7,7 @@ ko:
         authorization_without_authentication: "authorize_with를 사용하려면 authenticate_with가 필요합니다."
         unknown_field: "%{model} 모델에 %{field} 컬럼이 없습니다."
         non_editable_form_field: "%{model} 모델의 %{field} 컬럼은 수정할 수 없어 폼에 사용할 수 없습니다."
+        non_searchable_field: "%{model} 모델의 %{field} 컬럼은 문자열·텍스트 컬럼이 아니어서 검색에 사용할 수 없습니다."
     generator:
       options:
         path: "JSAdmin mount 경로"
@@ -49,6 +50,13 @@ ko:
         actions: "작업"
         no_records: "레코드가 없습니다"
       delete_confirmation: "이 레코드를 삭제하시겠습니까?"
+      search:
+        label: "검색"
+        placeholder: "검색어 입력"
+        submit: "검색"
+        clear: "초기화"
+      filters:
+        any: "%{field} 전체"
       pagination:
         label: "페이지 탐색"
         first: "처음"

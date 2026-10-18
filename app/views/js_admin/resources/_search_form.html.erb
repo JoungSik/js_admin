@@ -1,0 +1,23 @@
+<%= form_with url: resources_path(@resource.model_id), method: :get, class: "mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center", data: { turbo_action: "advance" } do %>
+  <% if @resource.search_fields.any? %>
+    <div class="sm:w-72">
+      <%= label_tag :q, t("js_admin.resources.search.label"), class: "sr-only" %>
+      <%= search_field_tag :q, @record_query.search_term, placeholder: t("js_admin.resources.search.placeholder"), class: js_admin_search_input_classes %>
+    </div>
+  <% end %>
+
+  <% @resource.filter_fields.each do |field| %>
+    <div class="sm:w-48">
+      <%= label_tag "filters_#{field.name}", field.human_name, class: "sr-only" %>
+      <%= select_tag "filters[#{field.name}]", options_for_select(field.filter_options, @record_query.filter_values[field.name]), include_blank: t("js_admin.resources.filters.any", field: field.human_name), id: "filters_#{field.name}", class: js_admin_filter_select_classes %>
+    </div>
+  <% end %>
+
+  <div class="flex items-center gap-3">
+    <%= submit_tag t("js_admin.resources.search.submit"), name: nil, class: "inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" %>
+
+    <% if @record_query.active? %>
+      <%= link_to t("js_admin.resources.search.clear"), resources_path(@resource.model_id), class: "text-sm font-medium text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-slate-100" %>
+    <% end %>
+  </div>
+<% end %>

@@ -8,6 +8,10 @@
   <%= link_to t("js_admin.resources.actions.new", resource: @resource.singular_label), new_resource_path(@resource.model_id), class: "inline-flex items-center justify-center rounded-md bg-sky-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-400" %>
 </div>
 
+<% if @resource.search_fields.any? || @resource.filter_fields.any? %>
+  <%= render "search_form" %>
+<% end %>
+
 <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
   <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
     <thead class="bg-slate-50 dark:bg-slate-900">
@@ -28,7 +32,7 @@
             <div class="flex items-center justify-end gap-3">
               <%= link_to t("js_admin.resources.actions.view"), resource_path(@resource.model_id, record), class: "font-medium text-sky-700 hover:text-sky-900 dark:text-sky-300 dark:hover:text-sky-200" %>
               <%= link_to t("js_admin.resources.actions.edit"), edit_resource_path(@resource.model_id, record), class: "font-medium text-slate-700 hover:text-slate-950 dark:text-slate-300 dark:hover:text-slate-100" %>
-              <%= button_to t("js_admin.resources.actions.delete"), resource_path(@resource.model_id, record), method: :delete, form: { class: "inline", data: { turbo_confirm: t("js_admin.resources.delete_confirmation") } }, class: "font-medium text-rose-700 hover:text-rose-900 dark:text-rose-300 dark:hover:text-rose-200" %>
+              <%= button_to t("js_admin.resources.actions.delete"), resource_path(@resource.model_id, record, **js_admin_list_params), method: :delete, form: { class: "inline", data: { turbo_confirm: t("js_admin.resources.delete_confirmation") } }, class: "font-medium text-rose-700 hover:text-rose-900 dark:text-rose-300 dark:hover:text-rose-200" %>
             </div>
           </td>
         </tr>
@@ -46,13 +50,13 @@
 <div class="mt-6 flex justify-end">
   <nav class="flex flex-wrap items-center justify-end gap-2" aria-label="<%= t("js_admin.resources.pagination.label") %>">
     <% if @page > 1 %>
-      <%= link_to t("js_admin.resources.pagination.first"), resources_path(@resource.model_id, page: 1), class: js_admin_pagination_link_classes %>
+      <%= link_to t("js_admin.resources.pagination.first"), resources_path(@resource.model_id, **js_admin_list_params(page: 1)), class: js_admin_pagination_link_classes %>
     <% else %>
       <span class="<%= js_admin_pagination_disabled_classes %>" aria-disabled="true"><%= t("js_admin.resources.pagination.first") %></span>
     <% end %>
 
     <% if @resource.previous_page?(@page) %>
-      <%= link_to t("js_admin.resources.pagination.previous"), resources_path(@resource.model_id, page: @page - 1), class: js_admin_pagination_link_classes %>
+      <%= link_to t("js_admin.resources.pagination.previous"), resources_path(@resource.model_id, **js_admin_list_params(page: @page - 1)), class: js_admin_pagination_link_classes %>
     <% else %>
       <span class="<%= js_admin_pagination_disabled_classes %>" aria-disabled="true"><%= t("js_admin.resources.pagination.previous") %></span>
     <% end %>
@@ -60,13 +64,13 @@
     <span class="<%= js_admin_pagination_status_classes %>" aria-current="page" aria-label="<%= t("js_admin.resources.pagination.status", page: @page, total_pages: @total_pages) %>"><%= @page %> / <%= @total_pages %></span>
 
     <% if @resource.next_page?(@page) %>
-      <%= link_to t("js_admin.resources.pagination.next"), resources_path(@resource.model_id, page: @page + 1), class: js_admin_pagination_link_classes %>
+      <%= link_to t("js_admin.resources.pagination.next"), resources_path(@resource.model_id, **js_admin_list_params(page: @page + 1)), class: js_admin_pagination_link_classes %>
     <% else %>
       <span class="<%= js_admin_pagination_disabled_classes %>" aria-disabled="true"><%= t("js_admin.resources.pagination.next") %></span>
     <% end %>
 
     <% if @page < @total_pages %>
-      <%= link_to t("js_admin.resources.pagination.last"), resources_path(@resource.model_id, page: @total_pages), class: js_admin_pagination_link_classes %>
+      <%= link_to t("js_admin.resources.pagination.last"), resources_path(@resource.model_id, **js_admin_list_params(page: @total_pages)), class: js_admin_pagination_link_classes %>
     <% else %>
       <span class="<%= js_admin_pagination_disabled_classes %>" aria-disabled="true"><%= t("js_admin.resources.pagination.last") %></span>
     <% end %>
